@@ -1,21 +1,13 @@
 import type { CSSProperties } from "react";
 
-import darkPrimitiveTokens from "@/tokens/brandcyan.dark.primitive.tokens.json";
-import darkSemanticTokens from "@/tokens/brandcyan.dark.semantic.tokens.json";
-import typographyTokens from "@/tokens/brandcyan.typography.styles.tokens.json";
+import {
+  generatedThemes,
+  generatedTypographyTokens,
+} from "./generated-design-tokens";
 
 type Dimension = {
   value: number;
   unit: "px";
-};
-
-type ColorValue = {
-  hex: string;
-};
-
-type DtcgToken<T> = {
-  $type: string;
-  $value: T;
 };
 
 type TypographyValue = {
@@ -26,52 +18,10 @@ type TypographyValue = {
   letterSpacing: Dimension;
 };
 
-type PrimitiveTokenGroups = Record<
-  string,
-  Record<string, DtcgToken<ColorValue>>
->;
-type SemanticTokens = Record<string, DtcgToken<string | ColorValue | number>>;
-type TypographyTokens = Record<string, DtcgToken<TypographyValue>>;
+type TypographyTokens = Record<string, TypographyValue>;
 
-const primitiveGroups =
-  darkPrimitiveTokens as unknown as PrimitiveTokenGroups;
-const semanticTokens = darkSemanticTokens as unknown as SemanticTokens;
-const textTokens = typographyTokens as unknown as TypographyTokens;
-
-function resolveColorReference(reference: string): string {
-  const [groupName, tokenName] = reference.slice(1, -1).split(".");
-  const color = primitiveGroups[groupName]?.[tokenName]?.$value.hex;
-
-  if (!color) {
-    throw new Error(`Unresolved DTCG color reference: ${reference}`);
-  }
-
-  return color;
-}
-
-function resolveSemanticColor(tokenName: string): string {
-  const value = semanticTokens[tokenName]?.$value;
-
-  if (typeof value === "string") {
-    return resolveColorReference(value);
-  }
-
-  if (typeof value === "object" && "hex" in value) {
-    return value.hex;
-  }
-
-  throw new Error(`Expected a color token for: ${tokenName}`);
-}
-
-function resolveNumber(tokenName: string): number {
-  const value = semanticTokens[tokenName]?.$value;
-
-  if (typeof value !== "number") {
-    throw new Error(`Expected a number token for: ${tokenName}`);
-  }
-
-  return value;
-}
+const textTokens =
+  generatedTypographyTokens as unknown as TypographyTokens;
 
 const fontWeights: Record<string, CSSProperties["fontWeight"]> = {
   Regular: 300,
@@ -81,7 +31,7 @@ const fontWeights: Record<string, CSSProperties["fontWeight"]> = {
 };
 
 function resolveTypography(tokenName: string): CSSProperties {
-  const value = textTokens[tokenName]?.$value;
+  const value = textTokens[tokenName];
 
   if (!value) {
     throw new Error(`Unresolved DTCG typography token: ${tokenName}`);
@@ -98,50 +48,88 @@ function resolveTypography(tokenName: string): CSSProperties {
 
 export const typography = {
   brandName: resolveTypography("brandcyan-brand-name-text"),
+  displaySmall: resolveTypography("brandcyan-display-small"),
+  headlineSmall: resolveTypography("brandcyan-headline-small"),
   subtitle: resolveTypography("brandcyan-title-medium"),
   bodyLarge: resolveTypography("brandcyan-body-large"),
+  bodyMedium: resolveTypography("brandcyan-body-medium"),
   bodySmall: resolveTypography("brandcyan-body-small"),
   button: resolveTypography("brandcyan-title-medium"),
   navigation: resolveTypography("brandcyan-label-small"),
   status: resolveTypography("brandcyan-title-small"),
 } as const;
 
+type GeneratedTheme = Record<string, string | number>;
+type ThemeStyle = CSSProperties & Record<`--${string}`, string>;
+
+function getColor(tokens: GeneratedTheme, tokenName: string): string {
+  const value = tokens[tokenName];
+
+  if (typeof value !== "string") {
+    throw new Error(`Expected a generated color token for: ${tokenName}`);
+  }
+
+  return value;
+}
+
+function getNumber(tokens: GeneratedTheme, tokenName: string): number {
+  const value = tokens[tokenName];
+
+  if (typeof value !== "number") {
+    throw new Error(`Expected a generated number token for: ${tokenName}`);
+  }
+
+  return value;
+}
+
+const darkTokens = generatedThemes.dark as GeneratedTheme;
+const lightTokens = generatedThemes.light as GeneratedTheme;
+
 export const radii = {
-  medium: resolveNumber("radius-m"),
-  full: resolveNumber("radius-full"),
+  medium: getNumber(darkTokens, "radius-m"),
+  full: getNumber(darkTokens, "radius-full"),
 } as const;
 
-export const darkThemeStyle = {
-  "--color-background": resolveSemanticColor("background"),
-  "--color-foreground": resolveSemanticColor("device-elements"),
-  "--color-card": resolveSemanticColor("container-background"),
-  "--color-card-foreground": resolveSemanticColor("container-text"),
-  "--color-popover": resolveSemanticColor("container-background"),
-  "--color-popover-foreground": resolveSemanticColor("container-text"),
-  "--color-primary": resolveSemanticColor("primary-button"),
-  "--color-primary-foreground": resolveSemanticColor("primary-button-text"),
-  "--color-primary-foreground-pressed": resolveSemanticColor(
-    "primary-button-text-pressed",
-  ),
-  "--color-secondary": resolveSemanticColor("secondary-button"),
-  "--color-secondary-foreground": resolveSemanticColor(
-    "secondary-button-text",
-  ),
-  "--color-muted": resolveSemanticColor("secondary-button"),
-  "--color-muted-foreground": resolveSemanticColor("text"),
-  "--color-accent": resolveSemanticColor("subtitle"),
-  "--color-accent-foreground": resolveSemanticColor("background"),
-  "--color-brand-name": resolveSemanticColor("brand-name-color"),
-  "--color-secondary-button-stroke": resolveSemanticColor(
-    "secondary-button-stroke",
-  ),
-  "--color-destructive": resolveSemanticColor("error message"),
-  "--color-destructive-foreground": resolveSemanticColor("device-elements"),
-  "--color-border": resolveSemanticColor("container-stroke"),
-  "--color-input": resolveSemanticColor("container-stroke"),
-  "--color-ring": resolveSemanticColor("primary-button"),
-  "--color-bottom-bar": resolveSemanticColor("bottom-bar"),
-  "--color-bottom-bar-selected": resolveSemanticColor("bottom-bar-selected"),
-  "--radius-medium": `${radii.medium}px`,
-  "--radius-full": `${radii.full}px`,
-} as CSSProperties & Record<`--${string}`, string>;
+function createThemeStyle(tokens: GeneratedTheme): ThemeStyle {
+  return {
+    "--color-background": getColor(tokens, "background"),
+    "--color-foreground": getColor(tokens, "device-elements"),
+    "--color-card": getColor(tokens, "container-background"),
+    "--color-card-foreground": getColor(tokens, "container-text"),
+    "--color-card-icon": getColor(tokens, "container-icon"),
+    "--color-popover": getColor(tokens, "container-background"),
+    "--color-popover-foreground": getColor(tokens, "container-text"),
+    "--color-primary": getColor(tokens, "primary-button"),
+    "--color-primary-foreground": getColor(tokens, "primary-button-text"),
+    "--color-primary-foreground-pressed": getColor(
+      tokens,
+      "primary-button-text-pressed",
+    ),
+    "--color-secondary": getColor(tokens, "secondary-button"),
+    "--color-secondary-foreground": getColor(
+      tokens,
+      "secondary-button-text",
+    ),
+    "--color-muted": getColor(tokens, "secondary-button"),
+    "--color-muted-foreground": getColor(tokens, "text"),
+    "--color-accent": getColor(tokens, "subtitle"),
+    "--color-accent-foreground": getColor(tokens, "background"),
+    "--color-brand-name": getColor(tokens, "brand-name-color"),
+    "--color-secondary-button-stroke": getColor(
+      tokens,
+      "secondary-button-stroke",
+    ),
+    "--color-destructive": getColor(tokens, "error message"),
+    "--color-destructive-foreground": getColor(tokens, "device-elements"),
+    "--color-border": getColor(tokens, "container-stroke"),
+    "--color-input": getColor(tokens, "container-stroke"),
+    "--color-ring": getColor(tokens, "primary-button"),
+    "--color-bottom-bar": getColor(tokens, "bottom-bar"),
+    "--color-bottom-bar-selected": getColor(tokens, "bottom-bar-selected"),
+    "--radius-medium": `${radii.medium}px`,
+    "--radius-full": `${radii.full}px`,
+  } as ThemeStyle;
+}
+
+export const darkThemeStyle = createThemeStyle(darkTokens);
+export const lightThemeStyle = createThemeStyle(lightTokens);

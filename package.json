@@ -3,13 +3,18 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "tokens:generate": "tsx scripts/generate-design-tokens.ts",
+    "predev": "tsx scripts/generate-design-tokens.ts",
     "dev": "vite",
+    "prebuild:client": "tsx scripts/generate-design-tokens.ts",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build",
     "build:server": "vite build --config vite.config.server.ts",
     "start": "node dist/server/node-build.mjs",
+    "pretest": "tsx scripts/generate-design-tokens.ts",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
+    "pretypecheck": "tsx scripts/generate-design-tokens.ts",
     "typecheck": "tsc"
   },
   "dependencies": {

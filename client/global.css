@@ -1,14 +1,28 @@
-/** @import must precede all other statements */
-@import url("https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,500;1,500&family=Oxanium:wght@500;600&family=Roboto:wght@500&display=swap");
 @import "tailwindcss";
 
 /* Theme, content globs, and plugins are declared in tailwind.config.ts. */
 @config "../tailwind.config.ts";
 
 @font-face {
+  font-family: "Montserrat Alternates";
+  src: url("/fonts/MontserratAlternates-Regular-Latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Oxanium";
+  src: url("/fonts/Oxanium-Variable-Latin.woff2") format("woff2");
+  font-weight: 300 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Nico Moji";
   src: url("/fonts/NicoMoji-Regular.ttf") format("truetype");
-  font-weight: 400;
+  font-weight: 300;
   font-style: normal;
   font-display: swap;
 }

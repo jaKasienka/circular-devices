@@ -25,12 +25,19 @@ export default function FeatureCard({
       )}
     >
       <div className="flex h-full w-48 items-center gap-2 py-3 pr-4 pl-2">
-        <img
-          src={iconSrc}
-          alt=""
-          className="h-10 w-11.25 shrink-0"
-          width={45}
-          height={40}
+        <span
+          aria-hidden
+          className="h-10 w-11.25 shrink-0 bg-(--color-card-icon)"
+          style={{
+            WebkitMaskImage: `url(${iconSrc})`,
+            maskImage: `url(${iconSrc})`,
+            WebkitMaskPosition: "center",
+            maskPosition: "center",
+            WebkitMaskRepeat: "no-repeat",
+            maskRepeat: "no-repeat",
+            WebkitMaskSize: "contain",
+            maskSize: "contain",
+          }}
         />
         <p
           className="flex-1 whitespace-pre-line text-card-foreground"

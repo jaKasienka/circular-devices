@@ -24,10 +24,10 @@ const FEATURE_CARDS = [
 export default function Index() {
   return (
     <section
-      className="flex h-165 w-full flex-col items-center gap-4"
+      className="flex min-h-165 w-full shrink-0 flex-col items-center gap-4"
       aria-labelledby="home-title"
     >
-      <header className="flex h-14 w-full flex-col items-center justify-start text-center">
+      <header className="flex h-14 w-full shrink-0 flex-col items-center justify-start text-center">
         <h1
           id="home-title"
           className="flex h-8 items-center whitespace-nowrap text-brand-name"
@@ -43,30 +43,33 @@ export default function Index() {
         </p>
       </header>
 
-      <div className="relative h-65.5 w-85.25 max-w-full overflow-hidden">
+      <div className="relative h-65.5 w-85.25 max-w-full shrink-0 overflow-hidden">
         <img
           src="/assets/logo.png"
           alt="Circular Devices logo"
           className="absolute top-[-10%] left-0 h-[130%] w-full max-w-none"
           width={341}
           height={340}
+          loading="eager"
+          fetchPriority="high"
+          decoding="sync"
         />
       </div>
 
-      <div className="relative h-42 w-86 max-w-full">
+      <div className="relative h-42 w-86 max-w-full shrink-0">
         {FEATURE_CARDS.map((card) => (
           <FeatureCard key={card.description} {...card} />
         ))}
       </div>
 
       <p
-        className="flex h-12 w-full items-center justify-center px-4 text-center text-muted-foreground"
+        className="flex h-12 w-full shrink-0 items-center justify-center px-4 text-center text-muted-foreground"
         style={typography.bodyLarge}
       >
         Curious? Scan your Device and see how much it&rsquo;s worth!
       </p>
 
-      <div className="flex h-14 w-full items-center gap-4 px-4">
+      <div className="flex h-14 w-full shrink-0 items-center gap-4 px-4">
         <Button
           asChild
           variant="secondary"

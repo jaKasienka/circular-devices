@@ -109,6 +109,10 @@
       ]
     }
   },
+  "primary-button-text-pressed": {
+    "$type": "color",
+    "$value": "{Schemes.Primary 95}"
+  },
   "secondary-button": {
     "$type": "color",
     "$value": "{Schemes.Secondary 95}",

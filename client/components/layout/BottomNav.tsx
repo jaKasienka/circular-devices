@@ -77,14 +77,22 @@ function NavIcon({
 
 export default function BottomNav() {
   return (
-    <nav className="h-16 w-full shrink-0 bg-background" aria-label="Primary">
+    <nav
+      className="mt-2 h-16 w-full shrink-0 bg-background"
+      aria-label="Primary"
+    >
       <div className="mx-auto flex h-full w-full max-w-85 items-center justify-between px-4 py-2">
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.to === "/"}
-            className="flex h-12 min-w-12 flex-col items-center justify-between focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className={({ isActive }) =>
+              cn(
+                "relative flex h-12 min-w-12 flex-col items-center justify-between transition-transform duration-200 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none",
+                isActive && "-translate-y-1",
+              )
+            }
           >
             {({ isActive }) => (
               <>
@@ -98,13 +106,22 @@ export default function BottomNav() {
                   className={cn(
                     "whitespace-nowrap",
                     isActive
-                      ? "text-bottom-bar-selected underline"
+                      ? "text-bottom-bar-selected"
                       : "text-bottom-bar",
                   )}
                   style={typography.navigation}
                 >
                   {item.label}
                 </span>
+                <span
+                  aria-hidden
+                  className={cn(
+                    "absolute -bottom-1 h-1 w-1 rounded-full bg-bottom-bar-selected transition-[opacity,transform] duration-200 motion-reduce:transition-none",
+                    isActive
+                      ? "scale-100 opacity-100"
+                      : "scale-0 opacity-0",
+                  )}
+                />
               </>
             )}
           </NavLink>
