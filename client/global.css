@@ -1,5 +1,5 @@
 /** @import must precede all other statements */
-@import url("https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=Montserrat:ital,wght@0,400;0,500;0,600;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,500;1,500&family=Oxanium:wght@500;600&family=Roboto:wght@500&display=swap");
 @import "tailwindcss";
 
 /* Theme, content globs, and plugins are declared in tailwind.config.ts. */
@@ -14,77 +14,119 @@
 }
 
 @layer base {
-  /**
-   * Tailwind CSS theme
-   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
-   * A different format will require also updating the theme in tailwind.config.ts.
-  */
-  :root {
-    --background: 189 20% 7%;
-    --foreground: 197 12% 88%;
-
-    --card: 184 100% 7%;
-    --card-foreground: 197 12% 88%;
-
-    --popover: 189 20% 7%;
-    --popover-foreground: 197 12% 88%;
-
-    --primary: 180 100% 60%;
-    --primary-foreground: 184 100% 11%;
-
-    --secondary: 184 100% 9%;
-    --secondary-foreground: 185 56% 68%;
-
-    --muted: 184 100% 9%;
-    --muted-foreground: 185 9% 77%;
-
-    --accent: 5 95% 64%;
-    --accent-foreground: 189 20% 7%;
-
-    --destructive: 5 95% 64%;
-    --destructive-foreground: 189 20% 7%;
-
-    --border: 184 100% 11%;
-    --input: 184 100% 11%;
-    --ring: 180 100% 60%;
-
-    --radius: 1rem;
-
-    --sidebar-background: 189 20% 7%;
-
-    --sidebar-foreground: 185 9% 77%;
-
-    --sidebar-primary: 180 100% 60%;
-
-    --sidebar-primary-foreground: 184 100% 11%;
-
-    --sidebar-accent: 184 100% 9%;
-
-    --sidebar-accent-foreground: 197 12% 88%;
-
-    --sidebar-border: 184 100% 11%;
-
-    --sidebar-ring: 180 100% 60%;
-  }
-}
-
-@layer base {
   * {
     @apply border-border;
   }
 
+  html,
   body {
-    @apply bg-background text-foreground;
+    min-height: 100%;
   }
 
-  :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
-    overflow-wrap: anywhere;
-    word-break: break-word;
+  body {
+    margin: 0;
   }
 
-  pre,
-  code {
-    overflow-x: auto;
-    white-space: pre;
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .mobile-action {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    transition:
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 180ms ease,
+      filter 180ms ease;
+    will-change: transform;
+  }
+
+  .mobile-action::after {
+    position: absolute;
+    inset: -35%;
+    content: "";
+    pointer-events: none;
+    border-radius: inherit;
+    background: radial-gradient(circle, currentColor 0%, transparent 62%);
+    opacity: 0;
+    transform: scale(0.35);
+    transition:
+      opacity 220ms ease,
+      transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .mobile-action-primary {
+    box-shadow: 0 8px 24px
+      color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+
+  .mobile-action-secondary {
+    box-shadow: 0 6px 18px
+      color-mix(in srgb, var(--color-secondary-button-stroke) 24%, transparent);
+  }
+
+  .mobile-action:active {
+    filter: brightness(0.92);
+    transform: translateY(2px) scale(0.97);
+    transition-duration: 70ms;
+  }
+
+  .mobile-action:active::after {
+    opacity: 0.14;
+    transform: scale(1);
+    transition-duration: 70ms;
+  }
+
+  .mobile-action-primary:active,
+  .mobile-action-primary:focus-visible {
+    color: var(--color-primary-foreground-pressed) !important;
+    filter: brightness(1.04);
+    text-shadow: 0 0 8px
+      color-mix(
+        in srgb,
+        var(--color-primary-foreground-pressed) 70%,
+        transparent
+      );
+    box-shadow:
+      0 0 12px
+        color-mix(
+          in srgb,
+          var(--color-primary-foreground-pressed) 28%,
+          transparent
+        ),
+      0 0 30px color-mix(in srgb, var(--color-primary) 42%, transparent);
+  }
+
+  .mobile-action-secondary:active,
+  .mobile-action-secondary:focus-visible {
+    text-shadow: 0 0 8px
+      color-mix(in srgb, currentColor 52%, transparent);
+    box-shadow:
+      0 0 10px color-mix(in srgb, currentColor 20%, transparent),
+      0 0 24px
+        color-mix(
+          in srgb,
+          var(--color-secondary-button-stroke) 38%,
+          transparent
+        );
+  }
+
+  .mobile-action:focus-visible {
+    filter: brightness(1.04);
+    transform: scale(1.01);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-action,
+    .mobile-action::after {
+      transition: none;
+    }
   }
 }

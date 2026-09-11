@@ -1,0 +1,17 @@
+# Circular Devices Project Rules
+
+- Use React 18, TypeScript, React Router 6, Vite, and Tailwind CSS.
+- Prefer `pnpm` for dependency management and project scripts.
+- Keep TypeScript strict: avoid `any`, type component props, and use type-only imports where appropriate.
+- Build small functional components and extract shared UI only when it removes meaningful duplication.
+- Reuse components from `client/components/ui/` and utilities such as `cn()` before creating alternatives.
+- Keep pages in `client/pages/` and declare routes in `client/App.tsx` above the catch-all route.
+- Use the `@/` alias for client imports and `@shared/` for shared types.
+- Use theme tokens from `client/global.css` and `tailwind.config.ts`; avoid duplicating raw colors.
+- Preserve the mobile-first Circular Devices design and verify layouts at 375 × 812 pixels.
+- Store permanent images and icons in `public/assets/`; do not commit expiring Figma asset URLs.
+- Use semantic HTML, accessible labels, meaningful image alt text, and visible keyboard focus states.
+- Add Express API endpoints only when logic must run server-side, such as secrets or protected database work.
+- Keep API routes under `/api/` and share request/response types through `shared/`.
+- Avoid unrelated refactors, unnecessary dependencies, and generated placeholder content.
+- After substantive changes, run `pnpm typecheck` and the relevant tests or build.

@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom";
+
 import { cn } from "@/lib/utils";
+import { typography } from "@/tokens/design-tokens";
 
 type NavItem = {
   to: string;
@@ -54,7 +56,7 @@ function NavIcon({
       aria-hidden
       className={cn(
         "block overflow-clip",
-        active ? "text-primary" : "text-muted-foreground",
+        active ? "text-bottom-bar-selected" : "text-bottom-bar",
       )}
       style={{
         width,
@@ -75,14 +77,14 @@ function NavIcon({
 
 export default function BottomNav() {
   return (
-    <nav className="sticky bottom-0 left-0 right-0 z-20 bg-background">
-      <div className="mx-auto flex w-full max-w-85 items-center justify-between px-4 py-2">
+    <nav className="h-16 w-full shrink-0 bg-background" aria-label="Primary">
+      <div className="mx-auto flex h-full w-full max-w-85 items-center justify-between px-4 py-2">
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.to === "/"}
-            className="flex h-12 min-w-12 flex-col items-center justify-end gap-1.75"
+            className="flex h-12 min-w-12 flex-col items-center justify-between focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {({ isActive }) => (
               <>
@@ -94,11 +96,12 @@ export default function BottomNav() {
                 />
                 <span
                   className={cn(
-                    "whitespace-nowrap font-sans text-[9px] font-medium",
+                    "whitespace-nowrap",
                     isActive
-                      ? "text-on-primary-container underline"
-                      : "text-muted-foreground",
+                      ? "text-bottom-bar-selected underline"
+                      : "text-bottom-bar",
                   )}
+                  style={typography.navigation}
                 >
                   {item.label}
                 </span>

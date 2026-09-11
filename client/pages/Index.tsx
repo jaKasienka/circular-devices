@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
+
 import FeatureCard from "@/components/home/FeatureCard";
+import { Button } from "@/components/ui/button";
+import { typography } from "@/tokens/design-tokens";
 
 const FEATURE_CARDS = [
   {
@@ -7,27 +10,36 @@ const FEATURE_CARDS = [
     iconSrc: "/assets/icon-money.svg",
     imageSrc: "/assets/card-phone.png",
     imageAlt: "Smartphone on a wooden table",
-    className: "absolute left-0 top-0 w-[256px]",
-    imageClassName: "w-[65px] rounded-xl",
+    className: "absolute top-0 left-0",
   },
   {
-    description: "Certified Data Deletion:\nSecure & Verifiable",
+    description: "Certified Data\nDeletion: Secure\n& Verifiable",
     iconSrc: "/assets/icon-shield.svg",
     imageSrc: "/assets/card-laptop.png",
     imageAlt: "Person working on a laptop",
-    className: "absolute left-[76px] top-[73px] w-[255px]",
+    className: "absolute top-22 left-18",
   },
 ] as const;
 
 export default function Index() {
   return (
-    <div className="flex w-full flex-col items-center gap-6.5 pb-4 pt-8">
-      <header className="flex w-full flex-col items-center text-center">
-        <h1 className="break-normal font-display text-[32px] leading-none whitespace-nowrap text-white">
+    <section
+      className="flex h-165 w-full flex-col items-center gap-4"
+      aria-labelledby="home-title"
+    >
+      <header className="flex h-14 w-full flex-col items-center justify-start text-center">
+        <h1
+          id="home-title"
+          className="flex h-8 items-center whitespace-nowrap text-brand-name"
+          style={typography.brandName}
+        >
           Circular Devices
         </h1>
-        <p className="mt-1 break-normal font-heading text-[15px] font-semibold uppercase tracking-[0.6px] whitespace-nowrap text-accent">
-          Recycling - Certified Data Deletion
+        <p
+          className="mt-4.5 whitespace-nowrap text-accent uppercase"
+          style={typography.subtitle}
+        >
+          RECYCLING - CERTIFIED DATA DELETION
         </p>
       </header>
 
@@ -35,34 +47,42 @@ export default function Index() {
         <img
           src="/assets/logo.png"
           alt="Circular Devices logo"
-          className="absolute left-0 top-[-10%] h-[130%] w-full max-w-none"
+          className="absolute top-[-10%] left-0 h-[130%] w-full max-w-none"
+          width={341}
+          height={340}
         />
       </div>
 
-      <div className="relative h-34.25 w-83 max-w-full">
+      <div className="relative h-42 w-86 max-w-full">
         {FEATURE_CARDS.map((card) => (
           <FeatureCard key={card.description} {...card} />
         ))}
       </div>
 
-      <p className="min-h-10 w-full px-4 text-center font-sans text-base italic leading-normal tracking-[0.48px] text-muted-foreground">
+      <p
+        className="flex h-12 w-full items-center justify-center px-4 text-center text-muted-foreground"
+        style={typography.bodyLarge}
+      >
         Curious? Scan your Device and see how much it&rsquo;s worth!
       </p>
 
-      <div className="flex w-full items-center justify-center gap-4 px-4">
-        <Link
-          to="/devices"
-          className="shrink-0 whitespace-nowrap rounded-full border border-[#004347] bg-secondary px-6 py-4 font-heading text-base font-semibold tracking-[1px] text-secondary-foreground transition hover:opacity-90"
+      <div className="flex h-14 w-full items-center gap-4 px-4">
+        <Button
+          asChild
+          variant="secondary"
+          className="mobile-action mobile-action-secondary h-14 shrink-0 rounded-full border border-secondary-button-stroke px-6 text-secondary-foreground focus-visible:ring-offset-background"
+          style={typography.button}
         >
-          DEVICES
-        </Link>
-        <Link
-          to="/scan"
-          className="flex min-w-0 flex-1 items-center justify-center whitespace-nowrap rounded-full bg-primary px-6 py-4 font-heading text-base font-semibold tracking-[1px] text-primary-foreground transition hover:opacity-90"
+          <Link to="/devices">DEVICES</Link>
+        </Button>
+        <Button
+          asChild
+          className="mobile-action mobile-action-primary h-14 min-w-0 flex-1 rounded-full px-6 focus-visible:ring-offset-background"
+          style={typography.button}
         >
-          SCAN NOW
-        </Link>
+          <Link to="/scan">SCAN NOW</Link>
+        </Button>
       </div>
-    </div>
+    </section>
   );
 }

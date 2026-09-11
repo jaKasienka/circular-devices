@@ -1,0 +1,258 @@
+{
+  "brandcyan-brand-name-text": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Nico Moji",
+      "fontWeight": "Regular",
+      "fontSize": {
+        "value": 32,
+        "unit": "px"
+      },
+      "lineHeight": 0,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-display-large": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Nico Moji",
+      "fontWeight": "Regular",
+      "fontSize": {
+        "value": 57,
+        "unit": "px"
+      },
+      "lineHeight": 64,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-display-medium": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Nico Moji",
+      "fontWeight": "Regular",
+      "fontSize": {
+        "value": 45,
+        "unit": "px"
+      },
+      "lineHeight": 52,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-display-small": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Nico Moji",
+      "fontWeight": "Regular",
+      "fontSize": {
+        "value": 36,
+        "unit": "px"
+      },
+      "lineHeight": 44,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-headline-large": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Oxanium",
+      "fontWeight": "Regular",
+      "fontSize": {
+        "value": 32,
+        "unit": "px"
+      },
+      "lineHeight": 40,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-headline-medium": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Oxanium",
+      "fontWeight": "Regular",
+      "fontSize": {
+        "value": 28,
+        "unit": "px"
+      },
+      "lineHeight": 36,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-headline-small": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Oxanium",
+      "fontWeight": "Regular",
+      "fontSize": {
+        "value": 24,
+        "unit": "px"
+      },
+      "lineHeight": 32,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-body-large": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Montserrat Alternates",
+      "fontWeight": "Medium",
+      "fontSize": {
+        "value": 16,
+        "unit": "px"
+      },
+      "lineHeight": 24,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-body-medium": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Montserrat Alternates",
+      "fontWeight": "Medium",
+      "fontSize": {
+        "value": 14,
+        "unit": "px"
+      },
+      "lineHeight": 22,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-body-small": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Montserrat Alternates",
+      "fontWeight": "Medium",
+      "fontSize": {
+        "value": 12,
+        "unit": "px"
+      },
+      "lineHeight": 18,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-label-large": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Oxanium",
+      "fontWeight": "SemiBold",
+      "fontSize": {
+        "value": 20,
+        "unit": "px"
+      },
+      "lineHeight": 28,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-label-medium": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Oxanium",
+      "fontWeight": "SemiBold",
+      "fontSize": {
+        "value": 16,
+        "unit": "px"
+      },
+      "lineHeight": 24,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-label-small": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Oxanium",
+      "fontWeight": "Medium",
+      "fontSize": {
+        "value": 11,
+        "unit": "px"
+      },
+      "lineHeight": 16,
+      "letterSpacing": {
+        "value": 0,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-title-large": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Oxanium",
+      "fontWeight": "SemiBold",
+      "fontSize": {
+        "value": 22,
+        "unit": "px"
+      },
+      "lineHeight": 28,
+      "letterSpacing": {
+        "value": 0.800000011920929,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-title-medium": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Oxanium",
+      "fontWeight": "SemiBold",
+      "fontSize": {
+        "value": 16,
+        "unit": "px"
+      },
+      "lineHeight": 24,
+      "letterSpacing": {
+        "value": 0.8,
+        "unit": "px"
+      }
+    }
+  },
+  "brandcyan-title-small": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "Oxanium",
+      "fontWeight": "Medium",
+      "fontSize": {
+        "value": 14,
+        "unit": "px"
+      },
+      "lineHeight": 20,
+      "letterSpacing": {
+        "value": 0.4000000059604645,
+        "unit": "px"
+      }
+    }
+  }
+}

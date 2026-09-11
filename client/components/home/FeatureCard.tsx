@@ -1,4 +1,6 @@
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { typography } from "@/tokens/design-tokens";
 
 type FeatureCardProps = {
   iconSrc: string;
@@ -6,7 +8,6 @@ type FeatureCardProps = {
   imageAlt: string;
   description: string;
   className?: string;
-  imageClassName?: string;
 };
 
 export default function FeatureCard({
@@ -15,35 +16,36 @@ export default function FeatureCard({
   imageAlt,
   description,
   className,
-  imageClassName,
 }: FeatureCardProps) {
   return (
-    <div
+    <Card
       className={cn(
-        "flex items-center overflow-hidden rounded-xl border border-border bg-card",
+        "flex h-20 w-68 items-center overflow-hidden rounded-lg shadow-none",
         className,
       )}
     >
-      <div className="flex items-center gap-3.25 py-3 pr-5 pl-1.25">
-        <div className="relative h-10 w-11.25 shrink-0 overflow-clip">
-          <img src={iconSrc} alt="" className="size-full" />
-        </div>
-        <p className="w-27 whitespace-pre-line font-sans text-[11px] leading-3.25 font-normal tracking-[0.22px] text-muted-foreground">
+      <div className="flex h-full w-48 items-center gap-2 py-3 pr-4 pl-2">
+        <img
+          src={iconSrc}
+          alt=""
+          className="h-10 w-11.25 shrink-0"
+          width={45}
+          height={40}
+        />
+        <p
+          className="flex-1 whitespace-pre-line text-card-foreground"
+          style={typography.bodySmall}
+        >
           {description}
         </p>
       </div>
-      <div
-        className={cn(
-          "relative h-16 w-16 shrink-0 self-stretch overflow-hidden",
-          imageClassName,
-        )}
-      >
-        <img
-          src={imageSrc}
-          alt={imageAlt}
-          className="size-full object-cover object-bottom"
-        />
-      </div>
-    </div>
+      <img
+        src={imageSrc}
+        alt={imageAlt}
+        className="h-full w-20 shrink-0 object-cover object-bottom"
+        width={80}
+        height={80}
+      />
+    </Card>
   );
 }
