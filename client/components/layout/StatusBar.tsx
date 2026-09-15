@@ -35,7 +35,7 @@ function StatusIcon({ src, className }: StatusIconProps) {
 export default function StatusBar() {
   return (
     <div
-      className="flex h-13 w-full shrink-0 items-end justify-between px-4 pb-2 text-foreground"
+      className="flex h-13 w-full shrink-0 items-end justify-between px-4 pb-2 text-foreground tablet:px-8"
       aria-label="Device status"
     >
       <time dateTime="09:30" style={typography.status}>

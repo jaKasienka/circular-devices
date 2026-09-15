@@ -10,7 +10,7 @@ export default function PlaceholderPage({
   description,
 }: PlaceholderPageProps) {
   return (
-    <div className="flex h-full min-h-96 flex-col items-center justify-center gap-4 px-6 text-center">
+    <div className="flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-4 px-6 text-center tablet:px-10">
       <h1 className="text-foreground" style={typography.headlineSmall}>
         {title}
       </h1>

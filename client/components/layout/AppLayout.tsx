@@ -33,28 +33,57 @@ export default function AppLayout() {
     }
   }, [requestedTheme]);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const updateViewportHeight = () => {
+      const height = window.visualViewport?.height ?? window.innerHeight;
+      root.style.setProperty("--app-height", `${Math.round(height)}px`);
+    };
+
+    updateViewportHeight();
+    window.visualViewport?.addEventListener("resize", updateViewportHeight);
+    window.visualViewport?.addEventListener("scroll", updateViewportHeight);
+    window.addEventListener("resize", updateViewportHeight);
+    window.addEventListener("orientationchange", updateViewportHeight);
+
+    return () => {
+      window.visualViewport?.removeEventListener(
+        "resize",
+        updateViewportHeight,
+      );
+      window.visualViewport?.removeEventListener(
+        "scroll",
+        updateViewportHeight,
+      );
+      window.removeEventListener("resize", updateViewportHeight);
+      window.removeEventListener("orientationchange", updateViewportHeight);
+    };
+  }, []);
+
   const isLightTheme = theme === "light";
 
   return (
     <div
       className={cn(
-        "flex min-h-svh items-center justify-center bg-background text-foreground",
+        "h-full w-full bg-background text-foreground",
         isLightTheme ? "light" : "dark",
       )}
       data-theme={isLightTheme ? "light" : "dark"}
       style={isLightTheme ? lightThemeStyle : darkThemeStyle}
     >
-      <div className="flex h-svh min-h-0 w-full max-w-93.75 flex-col items-center overflow-x-hidden bg-background">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-xl flex-col items-center overflow-hidden bg-background tablet:max-w-3xl">
         <StatusBar />
-        <main className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        <main className="flex min-h-0 w-full flex-1 flex-col overflow-auto">
           <Outlet />
         </main>
         <BottomNav />
         <div
-          className="flex h-6 w-full shrink-0 items-center justify-center"
+          className="flex w-full shrink-0 flex-col items-center pb-[env(safe-area-inset-bottom,0px)]"
           aria-hidden
         >
-          <div className="h-1 w-27.25 rounded-full bg-foreground" />
+          <div className="flex h-6 w-full items-center justify-center">
+            <div className="h-1 w-27.25 rounded-full bg-foreground" />
+          </div>
         </div>
       </div>
     </div>
