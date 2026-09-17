@@ -26,7 +26,7 @@ When processing wireframe mockups or legacy functional views:
 2. **Apply Auto Layout Structural Integrity**: Translate wireframe floating elements into strict nested flexboxes or relative linear layouts.
    - Text boundaries must use **Fill Container** or fluid flex constraints to avoid overflow breaks.
    - Paragraph layouts must use **Auto Height** boundaries with ample line heights to balance the wide geometries of Montserrat Alternates.
-3. **Token Mapping Translation**: Automatically strip placeholder standard generic system layouts (e.g., Arial, Inter, standard 12px) and map them to their corresponding `brandcyan-` semantic tokens.
+3. **Token Mapping Translation**: Automatically strip placeholder standard generic system layouts (e.g., Arial, Inter, standard 12px) and map them to their corresponding `brandcyan-` semantic tokens in tokens/brandcyan.typography.styles.tokens.json
 4. **Preserve User Flow and Functional Intent**: The layout might look messy in lo-fi, but do not drop buttons, data inputs, or tracking logic. Respect the interactive steps completely.
 
 ### 1. Typography Scales

@@ -49,6 +49,7 @@ function resolveTypography(tokenName: string): CSSProperties {
 export const typography = {
   brandName: resolveTypography("brandcyan-brand-name-text"),
   displaySmall: resolveTypography("brandcyan-display-small"),
+  headlineLarge: resolveTypography("brandcyan-headline-large"),
   headlineSmall: resolveTypography("brandcyan-headline-small"),
   subtitle: resolveTypography("brandcyan-title-medium"),
   bodyLarge: resolveTypography("brandcyan-body-large"),
