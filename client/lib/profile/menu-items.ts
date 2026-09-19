@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Accessibility,
   Bell,
+  BookOpen,
   SunMoon,
   Files,
   MapPinHouse,
@@ -22,6 +23,14 @@ export type ProfileMenuItem = {
 };
 
 export const PROFILE_MENU_ITEMS: ProfileMenuItem[] = [
+  {
+    id: "prototype",
+    label: "Prototype & case study",
+    icon: BookOpen,
+    variant: "filled",
+    path: "/profile/prototype",
+    description: "Demo disclaimer, privacy note, and portfolio case study bullets.",
+  },
   {
     id: "address",
     label: "Address",

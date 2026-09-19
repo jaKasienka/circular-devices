@@ -2,6 +2,15 @@ import { Bell, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import DeviceStatusIcon from "@/components/devices/DeviceStatusIcon";
+import {
+  deviceContinuePath,
+  deviceDetailPath,
+  isActionRequiredDevice,
+} from "@/lib/devices/device-navigation";
+import {
+  DEVICE_ROW_GRID_TEMPLATE,
+  DEVICE_ROW_SURFACE_CLASS,
+} from "@/lib/devices/device-row-layout";
 import type { DeviceRecord } from "@/lib/devices/types";
 import { typography } from "@/tokens/design-tokens";
 
@@ -15,75 +24,104 @@ function formatUsd(amount: number): string {
 
 export default function DeviceRow({ device }: DeviceRowProps) {
   const showBell =
-    device.daysRemaining !== undefined ||
-    ["scanned", "ready_shipment", "audit"].includes(device.status);
+    device.daysRemaining !== undefined || isActionRequiredDevice(device);
+
+  const hasQuote = device.quoteUsd !== undefined;
+  const hasAdjustment = device.adjustmentUsd !== undefined;
+  const detailPath = deviceDetailPath(device);
+  const continuePath = deviceContinuePath(device);
+  const actionRequired = isActionRequiredDevice(device);
 
   return (
-    <li className="list-none">
-      <div className="flex h-12 w-full min-w-0 items-center gap-2 rounded-full border border-border bg-card px-1">
-        <div className="flex size-12 shrink-0 items-center justify-center">
-          <DeviceStatusIcon status={device.status} />
+    <li
+      className={`list-none ${DEVICE_ROW_GRID_TEMPLATE} ${DEVICE_ROW_SURFACE_CLASS}`}
+    >
+      <Link
+        to={detailPath}
+        className="col-span-4 grid grid-cols-subgrid items-stretch focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+        aria-label={`View ${device.name} status and details`}
+      >
+        <div className="flex items-center justify-center self-stretch pl-0.5">
+          <DeviceStatusIcon status={device.status} className="size-6" />
         </div>
 
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <span
-            className="shrink-0 capitalize text-card-foreground"
+        <div className="flex min-w-0 items-center justify-start self-stretch pr-1">
+          <p
+            className="line-clamp-2 min-w-0 text-pretty text-left text-card-foreground"
             style={typography.bodyMedium}
           >
             {device.name}
-          </span>
+          </p>
+        </div>
 
-          {device.quoteUsd !== undefined && device.showPricePill ? (
-            <span
-              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-secondary-foreground"
-              style={typography.bodyMedium}
-            >
-              {formatUsd(device.quoteUsd)}
-            </span>
-          ) : null}
-
-          {device.quoteUsd !== undefined && !device.showPricePill ? (
-            <div className="flex min-w-0 flex-col">
-              <span className="text-card-foreground" style={typography.bodyMedium}>
-                {formatUsd(device.quoteUsd)}
-              </span>
-              {device.adjustmentUsd !== undefined ? (
-                <span className="text-card-foreground" style={typography.bodyMedium}>
-                  {formatUsd(device.adjustmentUsd)}
+        <div className="flex items-center justify-center self-stretch px-0.5">
+          {hasQuote ? (
+            <div className="flex flex-col items-end justify-center gap-0.5">
+              {device.showPricePill ? (
+                <span
+                  className="whitespace-nowrap rounded-full bg-secondary px-2 py-1 text-secondary-foreground"
+                  style={typography.bodyMedium}
+                >
+                  {formatUsd(device.quoteUsd!)}
+                </span>
+              ) : (
+                <span
+                  className="whitespace-nowrap text-card-foreground"
+                  style={typography.bodyMedium}
+                >
+                  {formatUsd(device.quoteUsd!)}
+                </span>
+              )}
+              {hasAdjustment ? (
+                <span
+                  className="whitespace-nowrap text-card-foreground"
+                  style={typography.bodyMedium}
+                >
+                  {formatUsd(device.adjustmentUsd!)}
                 </span>
               ) : null}
             </div>
           ) : null}
         </div>
 
-        <div className="flex shrink-0 items-center gap-1 pr-1">
+        <div className="flex items-center justify-center self-stretch">
           {showBell ? (
-            <div className="relative flex size-12 flex-col items-center justify-center">
-              <Bell
-                aria-hidden
-                className="size-5 text-muted-foreground"
-                strokeWidth={2}
-              />
-              {device.daysRemaining !== undefined ? (
+            device.daysRemaining !== undefined ? (
+              <div className="flex flex-col items-center justify-center gap-1">
+                <Bell
+                  aria-hidden
+                  className="size-5 shrink-0 text-muted-foreground"
+                  strokeWidth={2}
+                />
                 <span
-                  className="mt-0.5 text-center text-muted-foreground"
+                  className="whitespace-nowrap text-center text-muted-foreground"
                   style={typography.bodySmall}
                 >
-                  {device.daysRemaining} days left
+                  {device.daysRemaining} d left
                 </span>
-              ) : null}
-            </div>
+              </div>
+            ) : (
+              <Bell
+                aria-hidden
+                className="size-5 shrink-0 text-muted-foreground"
+                strokeWidth={2}
+              />
+            )
           ) : null}
-
-          <Link
-            to={`/devices/${device.id}`}
-            className="mobile-action mobile-action-primary flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={`Open ${device.name} details`}
-          >
-            <ChevronRight aria-hidden className="size-5" strokeWidth={2.5} />
-          </Link>
         </div>
-      </div>
+      </Link>
+
+      <Link
+        to={continuePath}
+        className="mobile-action mobile-action-primary flex items-center justify-center self-stretch rounded-none rounded-r-full bg-primary text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={
+          actionRequired
+            ? `Continue ${device.name} in scan flow`
+            : `Open ${device.name} details`
+        }
+      >
+        <ChevronRight aria-hidden className="size-5" strokeWidth={2.5} />
+      </Link>
     </li>
   );
 }

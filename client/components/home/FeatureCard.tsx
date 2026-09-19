@@ -1,11 +1,13 @@
 import type { CSSProperties } from "react";
+import type { LucideIcon } from "lucide-react";
 
+import IconBadge from "@/components/ui/icon-badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { typography } from "@/tokens/design-tokens";
 
 type FeatureCardProps = {
-  iconSrc: string;
+  icon: LucideIcon;
   imageSrc: string;
   imageAlt: string;
   description: string;
@@ -26,7 +28,7 @@ const cardImageClass =
   "h-full w-auto shrink-0 aspect-square rounded-r-lg object-cover object-bottom [@media(max-height:640px)]:rounded-r-[length:calc(var(--radius-medium)*0.875)] min-[400px]:rounded-r-[length:calc(var(--radius-medium)*1.25)] tall:rounded-r-[length:calc(var(--radius-medium)/4rem*clamp(7rem,12vh,9rem))]";
 
 export default function FeatureCard({
-  iconSrc,
+  icon: Icon,
   imageSrc,
   imageAlt,
   description,
@@ -34,21 +36,10 @@ export default function FeatureCard({
 }: FeatureCardProps) {
   return (
     <Card className={cn(cardShellClass, className)}>
-      <div className="flex h-full min-w-0 flex-1 items-center gap-2 py-2 pr-3 pl-2 min-[400px]:py-3 min-[400px]:pr-4 tall:gap-3 tall:pr-5 tall:pl-3">
-        <span
-          aria-hidden
-          className="aspect-36/32 h-1/2 w-auto shrink-0 bg-(--color-card-icon)"
-          style={{
-            WebkitMaskImage: `url(${iconSrc})`,
-            maskImage: `url(${iconSrc})`,
-            WebkitMaskPosition: "center",
-            maskPosition: "center",
-            WebkitMaskRepeat: "no-repeat",
-            maskRepeat: "no-repeat",
-            WebkitMaskSize: "contain",
-            maskSize: "contain",
-          }}
-        />
+      <div className="flex h-full min-w-0 flex-1 items-center gap-2.5 py-2 pr-3 pl-2 min-[400px]:gap-3 min-[400px]:py-3 min-[400px]:pr-4 tall:gap-3 tall:pr-5 tall:pl-3">
+        <IconBadge variant="emphasis">
+          <Icon aria-hidden strokeWidth={2} />
+        </IconBadge>
         <p
           className="min-w-0 flex-1 text-pretty wrap-break-word text-[clamp(11px,3.2vw,12px)] leading-[1.35] text-card-foreground tablet:text-[14px] tablet:leading-[22px] tall:text-[14px] tall:leading-[22px]"
           style={cardCopyStyle}

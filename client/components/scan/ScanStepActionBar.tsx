@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { isShipmentPickedUp } from "@/lib/scan/logistics-mock";
+import { MEMORY_DELETION_SERVICE_USD } from "@/lib/devices/constants";
 import { useScanFlow } from "@/lib/scan/ScanFlowContext";
 import type { ScanStepId } from "@/lib/scan/types";
 import { typography } from "@/tokens/design-tokens";
@@ -96,7 +97,7 @@ function getStepAction(
   capturing: boolean,
   setCapturing: (value: boolean) => void,
 ): ActionConfig | null {
-  const { state, completeStep, finishToDevices } = flow;
+  const { state, completeStep, setScanResult, finishToDevices } = flow;
 
   switch (stepId) {
     case "scan-instructions":
@@ -128,15 +129,37 @@ function getStepAction(
     case "scan-analysis":
       return null;
 
-    case "scan-result":
+    case "scan-result": {
+      if (state.scanResultMode === "deletion-only") {
+        return {
+          label: "Only erase my data",
+          onClick: () => {
+            const result = state.scanResult;
+            if (result) {
+              setScanResult({ ...result, recyclePath: "memory-deletion" });
+            }
+            completeStep(
+              "scan-result",
+              `Confirmed memory deletion service ($${MEMORY_DELETION_SERVICE_USD}) for ${result?.deviceName ?? "device"}.`,
+            );
+          },
+        };
+      }
+
       return {
         label: "Recycle and Earn",
-        onClick: () =>
+        onClick: () => {
+          const result = state.scanResult;
+          if (result) {
+            setScanResult({ ...result, recyclePath: "standard" });
+          }
           completeStep(
             "scan-result",
             `Accepted ${state.scanResult?.quoteUsd ?? 0} $ quote for ${state.scanResult?.deviceName ?? "device"}.`,
-          ),
+          );
+        },
       };
+    }
 
     case "seal-intro":
       return {
@@ -212,17 +235,6 @@ function getStepAction(
 
 function getSecondaryAction(stepId: ScanStepId, flow: FlowApi): ActionConfig | null {
   const { completeStep, resetFlow } = flow;
-
-  if (stepId === "scan-result") {
-    return {
-      label: "Only Erase My Data",
-      onClick: () =>
-        completeStep(
-          "scan-result",
-          "Chose certified memory deletion path instead of full recycle.",
-        ),
-    };
-  }
 
   if (stepId === "audit-waiting") {
     return {

@@ -1,5 +1,6 @@
 import { Check, type LucideIcon } from "lucide-react";
 
+import IconBadge, { type IconBadgeVariant } from "@/components/ui/icon-badge";
 import { cn } from "@/lib/utils";
 import { getPhaseStatus, SCAN_PHASES } from "@/lib/scan/flow-config";
 import { useScanFlow } from "@/lib/scan/ScanFlowContext";
@@ -89,24 +90,21 @@ function PhaseChip({
       "cursor-pointer hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
   );
 
+  const badgeVariant: IconBadgeVariant = isHighlighted
+    ? "active"
+    : status === "completed"
+      ? "emphasis"
+      : "muted";
+
   const content = (
     <>
-      <span
-        className={cn(
-          "flex size-9 shrink-0 items-center justify-center rounded-full",
-          isHighlighted
-            ? "bg-primary text-primary-foreground"
-            : status === "completed"
-              ? "bg-primary/20 text-primary"
-              : "bg-muted text-muted-foreground",
-        )}
-      >
+      <IconBadge variant={badgeVariant}>
         {status === "completed" ? (
-          <Check aria-hidden className="size-5" strokeWidth={2.5} />
+          <Check aria-hidden strokeWidth={2.5} />
         ) : (
-          <Icon aria-hidden className="size-5" strokeWidth={2} />
+          <Icon aria-hidden strokeWidth={2} />
         )}
-      </span>
+      </IconBadge>
       <span
         className={cn(
           "w-full shrink-0 text-center",

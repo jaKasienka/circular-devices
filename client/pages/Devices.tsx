@@ -2,9 +2,10 @@ import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { SlidersHorizontal } from "lucide-react";
 
-import DeviceLegend from "@/components/devices/DeviceLegend";
+import DeviceListSummary from "@/components/devices/DeviceListSummary";
 import DeviceRow from "@/components/devices/DeviceRow";
 import { Button } from "@/components/ui/button";
+import { DEVICE_LIST_CLASS } from "@/lib/devices/device-row-layout";
 import { MOCK_DEVICES } from "@/lib/devices/mock-devices";
 import { typography } from "@/tokens/design-tokens";
 
@@ -45,17 +46,17 @@ export default function Devices() {
         </p>
       </header>
 
-      <ul className="flex w-full min-w-0 flex-col gap-3">
+      <DeviceListSummary />
+
+      <ul className={DEVICE_LIST_CLASS}>
         {MOCK_DEVICES.map((device) => (
           <DeviceRow key={device.id} device={device} />
         ))}
       </ul>
 
-      <DeviceLegend />
-
       <Button
         asChild
-        className="mobile-action mobile-action-primary h-14 w-full shrink-0 rounded-full focus-visible:ring-offset-background"
+        className="mobile-action mobile-action-primary mt-2 h-14 w-full shrink-0 rounded-full focus-visible:ring-offset-background"
         style={typography.button}
       >
         <Link to="/scan">Scan a new Device</Link>

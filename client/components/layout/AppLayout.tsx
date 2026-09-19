@@ -8,6 +8,7 @@ import {
 } from "@/tokens/design-tokens";
 
 import BottomNav from "./BottomNav";
+import PrototypeNotice from "./PrototypeNotice";
 import StatusBar from "./StatusBar";
 
 type ThemeName = "dark" | "light";
@@ -74,6 +75,7 @@ export default function AppLayout() {
       <div className="mx-auto flex h-full min-h-0 w-full max-w-xl flex-col items-center overflow-hidden bg-background tablet:max-w-3xl">
         <StatusBar />
         <main className="flex min-h-0 w-full flex-1 flex-col overflow-auto">
+          <PrototypeNotice />
           <Outlet />
         </main>
         <BottomNav />

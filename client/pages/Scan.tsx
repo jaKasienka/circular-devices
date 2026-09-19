@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { X } from "lucide-react";
 
 import CompletedPhaseSummary from "@/components/scan/CompletedPhaseSummary";
@@ -53,8 +53,11 @@ function ScanPageContent() {
 }
 
 export default function Scan() {
+  const [searchParams] = useSearchParams();
+  const bootstrapDeviceId = searchParams.get("device");
+
   return (
-    <ScanFlowProvider>
+    <ScanFlowProvider bootstrapDeviceId={bootstrapDeviceId}>
       <ScanPageContent />
     </ScanFlowProvider>
   );

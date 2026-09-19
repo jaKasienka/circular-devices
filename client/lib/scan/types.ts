@@ -54,12 +54,16 @@ export type CompletedStepRecord = {
   completedAt: number;
 };
 
+export type ScanResultMode = "choice" | "deletion-only";
+
 export type ScanFlowState = {
   activePhase: ScanPhaseId;
   activeStep: ScanStepId;
   completedSteps: Partial<Record<ScanStepId, CompletedStepRecord>>;
   viewingCompletedPhase: ScanPhaseId | null;
   scanResult: ScanResult | null;
+  scanResultMode: ScanResultMode;
+  linkedDeviceId: string | null;
   sealOrder: SealOrder | null;
   shipmentPreferences: ShipmentPreferences | null;
   sealDeliveryStatus: SealDeliveryStatus;

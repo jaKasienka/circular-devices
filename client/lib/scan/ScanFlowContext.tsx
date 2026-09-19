@@ -16,6 +16,9 @@ import {
   isPhaseComplete,
   SCAN_PHASES,
 } from "./flow-config";
+import { buildScanBootstrap } from "@/lib/devices/device-flow-presets";
+import { MOCK_DEVICES } from "@/lib/devices/mock-devices";
+
 import {
   formatShippedDate,
   getNextSealDeliveryStatus,
@@ -42,6 +45,8 @@ const INITIAL_STATE: ScanFlowState = {
   completedSteps: {},
   viewingCompletedPhase: null,
   scanResult: null,
+  scanResultMode: "choice",
+  linkedDeviceId: null,
   sealOrder: null,
   shipmentPreferences: null,
   sealDeliveryStatus: "idle",
@@ -61,6 +66,13 @@ function normalizeStoredState(raw: Partial<ScanFlowState>): ScanFlowState {
   }
   if (merged.activeStep === ("seal-instructions" as ScanStepId)) {
     merged.activeStep = "seal-arrived";
+  }
+
+  if (merged.scanResultMode === undefined) {
+    merged.scanResultMode = "choice";
+  }
+  if (merged.linkedDeviceId === undefined) {
+    merged.linkedDeviceId = null;
   }
 
   return merged;
@@ -99,11 +111,20 @@ function persistState(state: ScanFlowState) {
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-export function ScanFlowProvider({ children }: { children: ReactNode }) {
+type ScanFlowProviderProps = {
+  children: ReactNode;
+  bootstrapDeviceId?: string | null;
+};
+
+export function ScanFlowProvider({
+  children,
+  bootstrapDeviceId = null,
+}: ScanFlowProviderProps) {
   const navigate = useNavigate();
   const [state, setState] = useState<ScanFlowState>(() => readStoredState());
   const sealTimerRef = useRef<number | null>(null);
   const shipmentTimerRef = useRef<number | null>(null);
+  const appliedBootstrapRef = useRef<string | null>(null);
 
   const updateState = useCallback(
     (updater: (current: ScanFlowState) => ScanFlowState) => {
@@ -115,6 +136,22 @@ export function ScanFlowProvider({ children }: { children: ReactNode }) {
     },
     [],
   );
+
+  useEffect(() => {
+    if (!bootstrapDeviceId || appliedBootstrapRef.current === bootstrapDeviceId) {
+      return;
+    }
+
+    const device = MOCK_DEVICES.find((entry) => entry.id === bootstrapDeviceId);
+    if (!device || device.status === "completed") {
+      return;
+    }
+
+    appliedBootstrapRef.current = bootstrapDeviceId;
+    const boot = buildScanBootstrap(device);
+    setState(boot);
+    persistState(boot);
+  }, [bootstrapDeviceId]);
 
   const clearSealTimer = useCallback(() => {
     if (sealTimerRef.current !== null) {

@@ -1,3 +1,4 @@
+import { DEMO_SCAN_DEVICE } from "@/lib/devices/demo-scan-device";
 import type { DeviceRecord, DeviceStatusLegendItem } from "./types";
 
 export const DEVICE_STATUS_LEGEND: DeviceStatusLegendItem[] = [
@@ -33,38 +34,40 @@ export const DEVICE_STATUS_LEGEND: DeviceStatusLegendItem[] = [
 
 export const MOCK_DEVICES: DeviceRecord[] = [
   {
-    id: "device-1",
-    name: "phone",
+    id: DEMO_SCAN_DEVICE.id,
+    name: DEMO_SCAN_DEVICE.name,
     status: "scanned",
-    quoteUsd: 175,
+    quoteUsd: DEMO_SCAN_DEVICE.quoteUsd,
     showPricePill: true,
   },
   {
     id: "device-2",
-    name: "phone",
+    name: "iPhone 13 mini",
     status: "seal_ordered",
     quoteUsd: 100,
     daysRemaining: 24,
   },
   {
     id: "device-3",
-    name: "phone",
+    name: "Google Pixel 8",
     status: "ready_shipment",
     quoteUsd: 325,
-    adjustmentUsd: -25,
+    scanEntry: "deletion-only",
   },
   {
     id: "device-4",
-    name: "phone",
+    name: "Motorola Edge 40",
     status: "shipped",
     quoteUsd: 75,
   },
   {
     id: "device-5",
-    name: "phone",
+    name: "iPhone XR",
     status: "completed",
     quoteUsd: 175,
     showPricePill: true,
+    completedPayoutUsd: 175,
+    soldDateLabel: "Sold 2/2/26",
   },
 ];
 

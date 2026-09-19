@@ -7,6 +7,8 @@ export type DeviceStatus =
   | "audit"
   | "completed";
 
+export type DeviceScanEntry = "choice" | "deletion-only";
+
 export type DeviceRecord = {
   id: string;
   name: string;
@@ -15,6 +17,11 @@ export type DeviceRecord = {
   adjustmentUsd?: number;
   daysRemaining?: number;
   showPricePill?: boolean;
+  /** How scan re-entry presents the post-scan decision (device-3 = deletion-only). */
+  scanEntry?: DeviceScanEntry;
+  /** Completed-device summary (Devices2 lo-fi). */
+  soldDateLabel?: string;
+  completedPayoutUsd?: number;
 };
 
 export type DeviceStatusLegendItem = {

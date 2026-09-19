@@ -10,7 +10,10 @@ import {
   Smartphone,
 } from "lucide-react";
 
+import { DEMO_SCAN_DEVICE } from "@/lib/devices/demo-scan-device";
+import { MEMORY_DELETION_SERVICE_USD } from "@/lib/devices/constants";
 import DeliveryTracker from "@/components/scan/DeliveryTracker";
+import { cn } from "@/lib/utils";
 import MaterialsCollapsible from "@/components/scan/MaterialsCollapsible";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -159,8 +162,8 @@ function ScanAnalysisStep() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setScanResult({
-        deviceName: "Samsung Galaxy S21",
-        quoteUsd: 175,
+        deviceName: DEMO_SCAN_DEVICE.name,
+        quoteUsd: DEMO_SCAN_DEVICE.quoteUsd,
         recyclePath: "standard",
       });
       completeStep(
@@ -191,13 +194,55 @@ function ScanAnalysisStep() {
 }
 
 function ScanResultStep() {
-  const { state, setScanResult } = useScanFlow();
-  const [showPremiumBranch, setShowPremiumBranch] = useState(false);
+  const { state, setScanResult, completeStep } = useScanFlow();
   const result = state.scanResult;
+  const deletionOnly = state.scanResultMode === "deletion-only";
 
   if (!result) {
     return (
       <StepShell title="Scan result" lead="No scan result available yet." />
+    );
+  }
+
+  const chooseMemoryDeletion = () => {
+    setScanResult({ ...result, recyclePath: "memory-deletion" });
+    completeStep(
+      "scan-result",
+      `Chose certified memory deletion ($${MEMORY_DELETION_SERVICE_USD}) for ${result.deviceName}.`,
+    );
+  };
+
+  if (deletionOnly) {
+    return (
+      <StepShell
+        title="Scan successful!"
+        lead={`${result.deviceName} is in premium condition.`}
+      >
+        <div
+          className="rounded-lg border border-accent/40 bg-accent/10 px-4 py-3 text-center"
+          role="status"
+        >
+          <p className="text-accent" style={typography.status}>
+            Too good to recycle
+          </p>
+          <p className="mt-1 text-muted-foreground" style={typography.bodySmall}>
+            Full recycling is not offered for this device. Continue with
+            certified data erasure and device return.
+          </p>
+        </div>
+
+        <div className="flex justify-center py-1">
+          <Smartphone
+            aria-hidden
+            className="size-24 text-muted-foreground/50"
+            strokeWidth={1.1}
+          />
+        </div>
+
+        <p className="text-center text-muted-foreground" style={typography.bodyMedium}>
+          Appraised value {result.quoteUsd} $ — hardware return after audit
+        </p>
+      </StepShell>
     );
   }
 
@@ -225,34 +270,24 @@ function ScanResultStep() {
 
       <MaterialsCollapsible />
 
-      {!showPremiumBranch ? (
-        <button
-          type="button"
-          className="text-left text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style={typography.bodyMedium}
-          onClick={() => setShowPremiumBranch(true)}
-        >
-          Too good to recycle?
-        </button>
-      ) : (
-        <div className="rounded-md border border-border bg-secondary/30 px-4 py-3">
-          <p className="text-foreground" style={typography.bodyMedium}>
-            Premium condition detected. Securely erase all data ($25) and keep
-            the hardware — you will receive the same certified audit video as
-            our recycling path.
-          </p>
-          <button
-            type="button"
-            className="mt-2 text-primary underline-offset-4 hover:underline"
-            style={typography.bodySmall}
-            onClick={() =>
-              setScanResult({ ...result, recyclePath: "memory-deletion" })
-            }
-          >
-            Use memory deletion path
-          </button>
-        </div>
-      )}
+      <button
+        type="button"
+        className={cn(
+          "mobile-action mobile-action-secondary w-full rounded-lg border border-secondary-button-stroke bg-secondary px-4 py-3 text-left",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          result.recyclePath === "memory-deletion" && "ring-2 ring-primary",
+        )}
+        onClick={chooseMemoryDeletion}
+      >
+        <p className="text-secondary-foreground" style={typography.button}>
+          Only erase my data
+        </p>
+        <p className="mt-1 text-muted-foreground" style={typography.bodySmall}>
+          Certified erasure ({MEMORY_DELETION_SERVICE_USD} $ service). Keep your
+          device — receive audit video and removal certificate. Same trust
+          standard as recycling.
+        </p>
+      </button>
 
       <p className="text-muted-foreground" style={typography.bodySmall}>
         Certified Data Destruction: Secure & Verifiable

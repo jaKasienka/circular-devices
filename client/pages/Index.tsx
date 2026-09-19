@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
+import { CircleDollarSign, ShieldCheck } from "lucide-react";
 
 import FeatureCard from "@/components/home/FeatureCard";
 import { Button } from "@/components/ui/button";
@@ -8,14 +9,14 @@ import { typography } from "@/tokens/design-tokens";
 const FEATURE_CARDS = [
   {
     description: "Get Money for your old/ broken Devices",
-    iconSrc: "/assets/icon-money.svg",
+    icon: CircleDollarSign,
     imageSrc: "/assets/card-phone.png",
     imageAlt: "Smartphone on a wooden table",
     align: "start",
   },
   {
     description: "Certified Data Deletion: Secure & Verifiable",
-    iconSrc: "/assets/icon-shield.svg",
+    icon: ShieldCheck,
     imageSrc: "/assets/card-laptop.png",
     imageAlt: "Person working on a laptop",
     align: "end",
@@ -72,7 +73,7 @@ export default function Index() {
         {FEATURE_CARDS.map((card) => (
           <FeatureCard
             key={card.description}
-            iconSrc={card.iconSrc}
+            icon={card.icon}
             imageSrc={card.imageSrc}
             imageAlt={card.imageAlt}
             description={card.description}

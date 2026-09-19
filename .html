@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Circular Devices Project Rules</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="circular-devices-project-rules">Circular Devices Project Rules</h1>
+<h2 id="-project-overview--core-mission">🎯 Project Overview &amp; Core Mission</h2>
+<p>You are building <strong>Circular Devices</strong>, a mobile-first recycling ecosystem centered around hardware lifecycle diagnostics.
+The app runs on a smartphone to dynamically scan and evaluate other (typically older/secondary) devices.
+Your task is to take <strong>functional lo-fi wireframes/user flows</strong> and refactor them into crisp, production-grade components using the design tokens defined below and referencing the visual look established on the Hi-Fi Home screen.</p>
+<h2 id="design-system-token-mapping">Design System Token Mapping</h2>
+<ul>
+<li><strong>Light Mode Primitives:</strong> <code>@/tokens/brandcyan.light.primitive.tokens.json</code></li>
+<li><strong>Light Mode Semantics:</strong> <code>@/tokens/brandcyan.light.semantic.tokens.json</code></li>
+<li><strong>Dark Mode Primitives:</strong> <code>@/tokens/brandcyan.dark.primitive.tokens.json</code></li>
+<li><strong>Dark Mode Semantics:</strong> <code>@/tokens/brandcyan.dark.semantic.tokens.json</code></li>
+<li><strong>Typography:</strong> <code>@/tokens/brandcyan.typography.styles.tokens.json</code></li>
+</ul>
+<h2 id="token--theme-rules">Token &amp; Theme Rules:</h2>
+<ol>
+<li><strong>Dark Theme (Default):</strong> Use token aliases from <code>brandcyan.dark.semantic.tokens.json</code> (resolving against <code>brandcyan.dark.primitive.tokens.json</code>).</li>
+<li><strong>Light Theme (<code>.light</code> / <code>@media</code>):</strong> Use token aliases from <code>brandcyan.light.semantic.tokens.json</code> (resolving against <code>brandcyan.light.primitive.tokens.json</code>).</li>
+<li><strong>Typography:</strong> Use the fonts and exact line-height definitions from <code>brandcyan.typography.styles.tokens.json</code>. Never use default CSS/Tailwind line-heights.</li>
+<li><strong>Font Weight Mapping:</strong> <code>&quot;Regular&quot;</code> -&gt; 300 (<code>font-normal</code>), <code>&quot;Medium&quot;</code> -&gt; 400 (<code>font-medium</code>), <code>&quot;SemiBold&quot;</code> -&gt; 500 (<code>font-semibold</code>), <code>&quot;Bold&quot;</code> -&gt; 600 (<code>font-bold</code>).</li>
+</ol>
+<h2 id="️-code-conversion-guidelines-from-lo-fi-wireframes">🛠️ Code Conversion Guidelines (From Lo-Fi Wireframes)</h2>
+<h3 id="-refactoring-logic">📈 Refactoring Logic</h3>
+<p>When processing wireframe mockups or legacy functional views:</p>
+<ol>
+<li><strong>Enforce Absolute Mobile-First Layouts</strong>: Standardize default frame structures around standard compact mobile viewports (e.g., width 375px, fluid vertical bounds).</li>
+<li><strong>Apply Auto Layout Structural Integrity</strong>: Translate wireframe floating elements into strict nested flexboxes or relative linear layouts.
+<ul>
+<li>Text boundaries must use <strong>Fill Container</strong> or fluid flex constraints to avoid overflow breaks.</li>
+<li>Paragraph layouts must use <strong>Auto Height</strong> boundaries with ample line heights to balance the wide geometries of Montserrat Alternates.</li>
+</ul>
+</li>
+<li><strong>Token Mapping Translation</strong>: Automatically strip placeholder standard generic system layouts (e.g., Arial, Inter, standard 12px) and map them to their corresponding <code>brandcyan-</code> semantic tokens in tokens/brandcyan.typography.styles.tokens.json</li>
+<li><strong>Preserve User Flow and Functional Intent</strong>: The layout might look messy in lo-fi, but do not drop buttons, data inputs, or tracking logic. Respect the interactive steps completely.</li>
+</ol>
+<h3 id="1-typography-scales">1. Typography Scales</h3>
+<ul>
+<li><strong>Display / Headline (Nico Moji)</strong>: Playful, geometric, wide, futuristic. Use as h1. Use with positive tracking for readability on massive displays/numerical callouts.</li>
+<li><strong>Headline / Title / Label (Oxanium)</strong>: Sharp, tech-inspired, angular. Highly visible for structural indicators, buttons, tags, and components.</li>
+<li><strong>Body (Montserrat Alternates)</strong>: Round and soft, echoing the geometry of Nico Moji while maintaining excellent structural line padding.</li>
+</ul>
+<p>Refer to <code>@/tokens/brandcyan...</code> for precise structural code mappings.</p>
+<h3 id="-global-design-tokens-configuration">🎨 Global Design Tokens Configuration</h3>
+<p>Always map UI components exclusively to these design mappings. DO NOT invent arbitrary font sizes, weights, or families. Ask if you think it's necessary.</p>
+<h2 id="stack--code-quality">Stack &amp; Code Quality:</h2>
+<ul>
+<li>Use React 18, TypeScript, React Router 6, Vite, and Tailwind CSS.</li>
+<li>Prefer <code>pnpm</code> for dependency management and project scripts.</li>
+<li>Keep TypeScript strict: avoid <code>any</code>, type component props, and use type-only imports where appropriate.</li>
+<li>Build small functional components and extract shared UI only when it removes meaningful duplication.</li>
+<li>Reuse components from <code>client/components/ui/</code> and utilities such as <code>cn()</code> before creating alternatives.</li>
+<li>Keep pages in <code>client/pages/</code> and declare routes in <code>client/App.tsx</code> above the catch-all route.</li>
+<li>Use the <code>@/</code> alias for client imports and <code>@shared/</code> for shared types.</li>
+<li>Use theme tokens from <code>@/tokens/</code> (and their generated CSS variables in <code>client/global.css</code> / <code>tailwind.config.ts</code>); avoid duplicating raw colors or hex values.</li>
+<li>Preserve the mobile-first Circular Devices design and verify layouts at 375 × 812 pixels.</li>
+<li>Store permanent images and icons in <code>public/assets/</code>; do not commit expiring Figma asset URLs.</li>
+<li>Use semantic HTML, accessible labels, meaningful image alt text, and visible keyboard focus states.</li>
+<li>Add Express API endpoints only when logic must run server-side, such as secrets or protected database work.</li>
+<li>Keep API routes under <code>/api/</code> and share request/response types through <code>shared/</code>.</li>
+<li>Avoid unrelated refactors, unnecessary dependencies, and generated placeholder content.</li>
+<li>After substantive changes, run <code>pnpm typecheck</code> and the relevant tests or build.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

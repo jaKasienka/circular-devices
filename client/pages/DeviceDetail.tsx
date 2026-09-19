@@ -1,11 +1,17 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 
 import DeviceStatusIcon from "@/components/devices/DeviceStatusIcon";
-import { Button } from "@/components/ui/button";
+import { MEMORY_DELETION_SERVICE_USD } from "@/lib/devices/constants";
+import {
+  deviceCompletedPath,
+  deviceContinuePath,
+  isInProgressDevice,
+} from "@/lib/devices/device-navigation";
 import {
   DEVICE_STATUS_LEGEND,
   MOCK_DEVICES,
 } from "@/lib/devices/mock-devices";
+import { Button } from "@/components/ui/button";
 import { typography } from "@/tokens/design-tokens";
 
 export default function DeviceDetail() {
@@ -28,6 +34,13 @@ export default function DeviceDetail() {
     );
   }
 
+  if (device.status === "completed") {
+    return <Navigate to={deviceCompletedPath(device.id)} replace />;
+  }
+
+  const continuePath = deviceContinuePath(device);
+  const deletionOnly = device.scanEntry === "deletion-only";
+
   return (
     <section className="flex min-h-full w-full min-w-0 flex-col gap-6 px-4 py-4 tablet:px-8">
       <header className="flex flex-col gap-3">
@@ -36,16 +49,27 @@ export default function DeviceDetail() {
         </Button>
         <div className="flex items-center gap-3">
           <DeviceStatusIcon status={device.status} className="size-8" />
-          <h1
-            className="capitalize text-foreground"
-            style={typography.headlineSmall}
-          >
+          <h1 className="min-w-0 text-foreground" style={typography.headlineSmall}>
             {device.name}
           </h1>
         </div>
       </header>
 
-      <div className="rounded-lg border border-border bg-card p-4">
+      <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4">
+        {statusLabel ? (
+          <p className="text-pretty text-card-foreground" style={typography.bodyMedium}>
+            {statusLabel}
+          </p>
+        ) : null}
+
+        {deletionOnly ? (
+          <p className="text-muted-foreground" style={typography.bodySmall}>
+            Premium condition — recycling is not offered. Continue with certified
+            data erasure ({MEMORY_DELETION_SERVICE_USD} $ service) and device
+            return after audit.
+          </p>
+        ) : null}
+
         {device.quoteUsd !== undefined ? (
           <p className="text-card-foreground" style={typography.bodyLarge}>
             Quote: {device.quoteUsd} $
@@ -61,21 +85,15 @@ export default function DeviceDetail() {
             {device.daysRemaining} days left
           </p>
         ) : null}
-        {statusLabel ? (
-          <p className="mt-3 text-muted-foreground" style={typography.bodySmall}>
-            {statusLabel}
-          </p>
-        ) : null}
       </div>
 
-      <p className="text-muted-foreground" style={typography.bodyMedium}>
-        Device detail flow will connect to the Scan wizard steps in a later
-        pass. This screen preserves navigation from the lo-fi prototype.
-      </p>
-
-      {["scanned", "ready_shipment", "audit"].includes(device.status) ? (
-        <Button asChild className="mobile-action mobile-action-primary h-14 rounded-full">
-          <Link to="/scan">Continue scan flow</Link>
+      {isInProgressDevice(device) ? (
+        <Button
+          asChild
+          className="mobile-action mobile-action-primary h-14 rounded-full"
+          style={typography.button}
+        >
+          <Link to={continuePath}>Continue in scan flow</Link>
         </Button>
       ) : null}
     </section>
