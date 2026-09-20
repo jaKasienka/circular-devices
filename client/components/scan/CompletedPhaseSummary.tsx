@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { MEMORY_DELETION_SERVICE_USD } from "@/lib/devices/constants";
 import { SCAN_PHASES, STEP_LABELS } from "@/lib/scan/flow-config";
 import { useScanFlow } from "@/lib/scan/ScanFlowContext";
 import type { ScanPhaseId } from "@/lib/scan/types";
@@ -87,14 +88,28 @@ function PhaseExtras({ phaseId }: { phaseId: ScanPhaseId }) {
   const { state } = useScanFlow();
 
   if (phaseId === "scan" && state.scanResult) {
+    const isDeletion = state.scanResult.recyclePath === "memory-deletion";
+
     return (
       <div className="rounded-md border border-primary/30 bg-primary/10 px-4 py-3">
         <p className="text-foreground" style={typography.status}>
           {state.scanResult.deviceName}
         </p>
-        <p className="text-primary" style={typography.headlineSmall}>
-          {state.scanResult.quoteUsd} $
-        </p>
+        {isDeletion ? (
+          <>
+            <p className="text-primary" style={typography.headlineSmall}>
+              Certified erasure — {MEMORY_DELETION_SERVICE_USD} $ service
+            </p>
+            <p className="mt-1 text-muted-foreground" style={typography.bodySmall}>
+              Appraised value {state.scanResult.quoteUsd} $ (return after audit,
+              not a payout)
+            </p>
+          </>
+        ) : (
+          <p className="text-primary" style={typography.headlineSmall}>
+            {state.scanResult.quoteUsd} $ recycle quote
+          </p>
+        )}
       </div>
     );
   }
@@ -114,9 +129,13 @@ function PhaseExtras({ phaseId }: { phaseId: ScanPhaseId }) {
   }
 
   if (phaseId === "ship" && state.shippedAt) {
+    const isDeletion = state.scanResult?.recyclePath === "memory-deletion";
+
     return (
       <p className="text-muted-foreground" style={typography.bodyMedium}>
-        Shipped {state.shippedAt}. Waiting for video, money, and certificate.
+        {isDeletion
+          ? `Handoff ${state.shippedAt}. Waiting for audit video, erasure certificate, and device return.`
+          : `Shipped ${state.shippedAt}. Waiting for video, money, and certificate.`}
       </p>
     );
   }

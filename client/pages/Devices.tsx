@@ -5,7 +5,10 @@ import { SlidersHorizontal } from "lucide-react";
 import DeviceListSummary from "@/components/devices/DeviceListSummary";
 import DeviceRow from "@/components/devices/DeviceRow";
 import { Button } from "@/components/ui/button";
-import { deviceFreshScanPath } from "@/lib/devices/device-navigation";
+import {
+  compareDevicesByUrgency,
+  deviceFreshScanPath,
+} from "@/lib/devices/device-navigation";
 import { DEVICE_LIST_CLASS } from "@/lib/devices/device-row-layout";
 import { MOCK_DEVICES } from "@/lib/devices/mock-devices";
 import { typography } from "@/tokens/design-tokens";
@@ -15,6 +18,8 @@ function pageTitleStyle(): CSSProperties {
 }
 
 export default function Devices() {
+  const devicesByUrgency = [...MOCK_DEVICES].sort(compareDevicesByUrgency);
+
   return (
     <section
       className="flex min-h-full w-full min-w-0 flex-col gap-4 px-4 pb-4 pt-2 tablet:px-8"
@@ -50,7 +55,7 @@ export default function Devices() {
       <DeviceListSummary />
 
       <ul className={DEVICE_LIST_CLASS}>
-        {MOCK_DEVICES.map((device) => (
+        {devicesByUrgency.map((device) => (
           <DeviceRow key={device.id} device={device} />
         ))}
       </ul>

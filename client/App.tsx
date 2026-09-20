@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import Index from "./pages/Index";
+import DeviceAuditReview from "./pages/DeviceAuditReview";
 import DeviceCompletedSummary from "./pages/DeviceCompletedSummary";
 import DeviceDetail from "./pages/DeviceDetail";
 import Devices from "./pages/Devices";
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/devices" element={<Devices />} />
             <Route path="/devices/:deviceId/completed" element={<DeviceCompletedSummary />} />
+            <Route path="/devices/:deviceId/audit" element={<DeviceAuditReview />} />
             <Route path="/devices/:deviceId" element={<DeviceDetail />} />
             <Route path="/scan" element={<Scan />} />
             <Route path="/profile" element={<Profile />} />

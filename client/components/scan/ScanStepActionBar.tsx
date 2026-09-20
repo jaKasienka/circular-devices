@@ -1,13 +1,16 @@
 import { useState, type MouseEvent } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { isShipmentPickedUp } from "@/lib/scan/logistics-mock";
 import { MEMORY_DELETION_SERVICE_USD } from "@/lib/devices/constants";
+import { deviceAuditPath } from "@/lib/devices/device-navigation";
 import { useScanFlow } from "@/lib/scan/ScanFlowContext";
 import type { ScanStepId } from "@/lib/scan/types";
 import ScanBottomAction from "./ScanBottomAction";
 
 export default function ScanStepActionBar() {
   const [capturing, setCapturing] = useState(false);
+  const navigate = useNavigate();
   const flow = useScanFlow();
   const { state } = flow;
 
@@ -15,7 +18,13 @@ export default function ScanStepActionBar() {
     return null;
   }
 
-  const action = getStepAction(state.activeStep, flow, capturing, setCapturing);
+  const action = getStepAction(
+    state.activeStep,
+    flow,
+    capturing,
+    setCapturing,
+    navigate,
+  );
 
   if (!action) {
     return <div className="h-8 w-full shrink-0" aria-hidden />;
@@ -52,6 +61,7 @@ function getStepAction(
   flow: FlowApi,
   capturing: boolean,
   setCapturing: (value: boolean) => void,
+  navigate: ReturnType<typeof useNavigate>,
 ): ActionConfig | null {
   const {
     state,
@@ -210,6 +220,13 @@ function getStepAction(
       };
 
     case "audit-waiting":
+      if (state.linkedDeviceId) {
+        return {
+          label: "Watch audit video (optional)",
+          helperText: "Video ready — payout processing (optional review)",
+          onClick: () => navigate(deviceAuditPath(state.linkedDeviceId!)),
+        };
+      }
       return {
         label: "Go to My Devices",
         onClick: finishToDevices,

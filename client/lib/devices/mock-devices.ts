@@ -24,7 +24,7 @@ export const DEVICE_STATUS_LEGEND: DeviceStatusLegendItem[] = [
   },
   {
     status: "audit",
-    label: "Fully Recycled - Please Audit the Video we sent you!",
+    label: "Video ready — payout on the way. Review the audit video when you like.",
   },
   {
     status: "completed",
@@ -87,7 +87,8 @@ export function getEarnedTotal(devices: DeviceRecord[]): number {
 }
 
 export function getActionRequiredCount(devices: DeviceRecord[]): number {
-  return devices.filter((device) =>
-    ["scanned", "ready_shipment", "audit"].includes(device.status),
+  return devices.filter(
+    (device) =>
+      device.status === "scanned" || device.status === "ready_shipment",
   ).length;
 }

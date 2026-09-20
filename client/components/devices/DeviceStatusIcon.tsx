@@ -22,7 +22,6 @@ export default function DeviceStatusIcon({
   switch (status) {
     case "scanned":
     case "ready_shipment":
-    case "audit":
       return (
         <AlertCircle
           aria-hidden
@@ -32,6 +31,7 @@ export default function DeviceStatusIcon({
       );
     case "seal_ordered":
     case "shipped":
+    case "audit":
       return (
         <LoaderCircle
           aria-hidden

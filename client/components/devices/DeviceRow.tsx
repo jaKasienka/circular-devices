@@ -6,6 +6,7 @@ import {
   deviceContinuePath,
   deviceDetailPath,
   isActionRequiredDevice,
+  isAuditReadyDevice,
 } from "@/lib/devices/device-navigation";
 import {
   DEVICE_ROW_GRID_TEMPLATE,
@@ -23,14 +24,27 @@ function formatUsd(amount: number): string {
 }
 
 export default function DeviceRow({ device }: DeviceRowProps) {
+  const auditReady = isAuditReadyDevice(device);
   const showBell =
-    device.daysRemaining !== undefined || isActionRequiredDevice(device);
+    device.daysRemaining !== undefined ||
+    isActionRequiredDevice(device) ||
+    auditReady;
 
   const hasQuote = device.quoteUsd !== undefined;
   const hasAdjustment = device.adjustmentUsd !== undefined;
   const detailPath = deviceDetailPath(device);
   const continuePath = deviceContinuePath(device);
   const actionRequired = isActionRequiredDevice(device);
+
+  function chevronAriaLabel(): string {
+    if (auditReady) {
+      return `Review audit video for ${device.name}`;
+    }
+    if (actionRequired) {
+      return `Continue ${device.name} in scan flow`;
+    }
+    return `Open ${device.name} details`;
+  }
 
   return (
     <li
@@ -86,7 +100,7 @@ export default function DeviceRow({ device }: DeviceRowProps) {
 
         <div className="flex items-center justify-center self-stretch">
           {showBell ? (
-            device.daysRemaining !== undefined ? (
+            device.daysRemaining !== undefined || auditReady ? (
               <div className="flex flex-col items-center justify-center gap-1">
                 <Bell
                   aria-hidden
@@ -97,7 +111,7 @@ export default function DeviceRow({ device }: DeviceRowProps) {
                   className="whitespace-nowrap text-center text-muted-foreground"
                   style={typography.bodySmall}
                 >
-                  {device.daysRemaining} d left
+                  {auditReady ? "final" : `${device.daysRemaining} d left`}
                 </span>
               </div>
             ) : (
@@ -114,11 +128,7 @@ export default function DeviceRow({ device }: DeviceRowProps) {
       <Link
         to={continuePath}
         className="mobile-action mobile-action-primary flex items-center justify-center self-stretch rounded-none rounded-r-full bg-primary text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label={
-          actionRequired
-            ? `Continue ${device.name} in scan flow`
-            : `Open ${device.name} details`
-        }
+        aria-label={chevronAriaLabel()}
       >
         <ChevronRight aria-hidden className="size-5" strokeWidth={2.5} />
       </Link>

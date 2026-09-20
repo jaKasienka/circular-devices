@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Camera,
   CheckCircle2,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { MEMORY_DELETION_SERVICE_USD } from "@/lib/devices/constants";
+import { deviceAuditPath } from "@/lib/devices/device-navigation";
 import { DEFAULT_SEAL_ORDER } from "@/lib/devices/device-flow-presets";
 import { DEMO_SCAN_DEVICE } from "@/lib/devices/demo-scan-device";
 import DeliveryTracker from "@/components/scan/DeliveryTracker";
@@ -827,11 +829,57 @@ function ShipQrStep() {
 
 function ShipSuccessStep() {
   const { state } = useScanFlow();
+  const isDeletion = state.scanResult?.recyclePath === "memory-deletion";
+  const shippedLabel = state.shippedAt ?? "today";
+
+  if (isDeletion) {
+    return (
+      <StepShell
+        title="Device received for certified erasure"
+        lead={`Handoff confirmed ${shippedLabel} — your part is done. We will audit, erase, and return your device.`}
+      >
+        <div className="flex flex-col items-center gap-3 text-center">
+          <CheckCircle2
+            aria-hidden
+            className="size-20 text-primary"
+            strokeWidth={1.25}
+          />
+          <p className="text-primary" style={typography.headlineLarge}>
+            Thank you!
+          </p>
+          <p className="text-muted-foreground" style={typography.bodyMedium}>
+            Thank you for trusting Circular with certified data erasure and
+            secure return of your device.
+          </p>
+        </div>
+
+        <div className="rounded-lg bg-primary/10 px-4 py-4 text-center">
+          <p className="text-primary" style={typography.headlineLarge}>
+            {MEMORY_DELETION_SERVICE_USD} $
+          </p>
+          <p className="text-muted-foreground" style={typography.bodySmall}>
+            Erasure service — authorized at shipment configure
+          </p>
+        </div>
+
+        <ul className="list-inside list-disc text-muted-foreground" style={typography.bodyMedium}>
+          <li>Audit video of certified handling</li>
+          <li>Certificate of secure data erasure</li>
+          <li>Return shipment of your device after audit</li>
+        </ul>
+
+        <p className="text-muted-foreground" style={typography.bodySmall}>
+          After you receive the audit video, your erasure certificate and return
+          tracking will follow in My Devices.
+        </p>
+      </StepShell>
+    );
+  }
 
   return (
     <StepShell
       title="You successfully shipped your device!"
-      lead={`Status: Shipped ${state.shippedAt ?? "today"} — your part is done. Waiting for video, money, and certificate.`}
+      lead={`Status: Shipped ${shippedLabel} — your part is done. Payout and certificate are processing (≤ ${AUDIT_DELIVERABLE_ETA_HOURS} h); watch the audit video anytime.`}
     >
       <div className="flex flex-col items-center gap-3 text-center">
         <CheckCircle2
@@ -853,7 +901,7 @@ function ShipSuccessStep() {
             {state.scanResult.quoteUsd} $
           </p>
           <p className="text-muted-foreground" style={typography.bodySmall}>
-            Pending payout via PayPal
+            Payout processing via PayPal
           </p>
         </div>
       ) : null}
@@ -865,40 +913,100 @@ function ShipSuccessStep() {
       </ul>
 
       <p className="text-muted-foreground" style={typography.bodySmall}>
-        One hour after you receive the video, you&apos;ll get your money and
-        certificate.
+        Payout and certificate typically land within {AUDIT_DELIVERABLE_ETA_HOURS}{" "}
+        hours — video review is optional, not a gate.
       </p>
     </StepShell>
   );
 }
 
+const AUDIT_DELIVERABLE_ETA_HOURS = 4;
+
 function AuditWaitingStep() {
   const { state } = useScanFlow();
+  const isDeletion = state.scanResult?.recyclePath === "memory-deletion";
+  const shippedLabel = state.shippedAt ?? "today";
+  const auditPagePath = state.linkedDeviceId
+    ? deviceAuditPath(state.linkedDeviceId)
+    : null;
+
+  if (isDeletion) {
+    return (
+      <StepShell
+        title="Audit & certified erasure"
+        lead={`Received ${shippedLabel} — deliverables and return status will appear below.`}
+      >
+        <WaitingDeliverable
+          title="Your audit video"
+          placeholder="Certified handling video will appear here soon"
+        />
+        <WaitingDeliverable
+          title="Your erasure certificate"
+          placeholder="PDF certificate of secure data removal — pending"
+        />
+        <WaitingDeliverable
+          title="Device return"
+          placeholder="Return shipment tracking will appear after audit completes"
+        />
+
+        <p className="text-muted-foreground" style={typography.bodySmall}>
+          Service fee ({MEMORY_DELETION_SERVICE_USD} $) was confirmed at
+          shipment setup. No recycle payout applies to this device.
+        </p>
+
+        <p className="text-muted-foreground" style={typography.bodySmall}>
+          Stored in My Devices — revisit anytime from the bottom bar.
+        </p>
+
+        {auditPagePath ? (
+          <Button
+            asChild
+            variant="secondary"
+            className="mobile-action mobile-action-secondary h-12 w-full rounded-full border border-secondary-button-stroke"
+            style={typography.button}
+          >
+            <Link to={auditPagePath}>Open audit video screen</Link>
+          </Button>
+        ) : null}
+      </StepShell>
+    );
+  }
 
   return (
     <StepShell
       title="Audit, Cashier, Get Certified"
-      lead={`Shipped ${state.shippedAt ?? "today"} — deliverables will appear below as they become available.`}
+      lead={`Shipped ${shippedLabel} — video ready, payout on the way. Review the audit video if you want (within ${AUDIT_DELIVERABLE_ETA_HOURS} h for payout & certificate).`}
     >
       <WaitingDeliverable
         title="Your Video"
-        placeholder="Video will appear here soon"
+        placeholder="Ready — open the audit screen to watch (optional)"
       />
       <WaitingDeliverable
         title="Your Money"
         placeholder={
           state.scanResult
-            ? `PayPal — ${state.scanResult.quoteUsd} $ — Status: pending`
+            ? `PayPal — ${state.scanResult.quoteUsd} $ — processing (≤ ${AUDIT_DELIVERABLE_ETA_HOURS} h)`
             : "Status: pending"
         }
       />
       <WaitingDeliverable
         title="Your Certificate"
-        placeholder="Certificate will appear here soon (PDF)"
+        placeholder={`Recycling certificate — typically with payout (≤ ${AUDIT_DELIVERABLE_ETA_HOURS} h)`}
       />
 
+      {auditPagePath ? (
+        <Button
+          asChild
+          className="mobile-action mobile-action-primary h-12 w-full rounded-full"
+          style={typography.button}
+        >
+          <Link to={auditPagePath}>Watch audit video (optional)</Link>
+        </Button>
+      ) : null}
+
       <p className="text-muted-foreground" style={typography.bodySmall}>
-        Stored in My Devices — revisit anytime from the bottom bar.
+        Stored in My Devices — tap a device with the waiting icon or bell to
+        open this audit screen anytime.
       </p>
     </StepShell>
   );

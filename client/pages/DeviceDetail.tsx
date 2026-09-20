@@ -3,8 +3,10 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import DeviceStatusIcon from "@/components/devices/DeviceStatusIcon";
 import { MEMORY_DELETION_SERVICE_USD } from "@/lib/devices/constants";
 import {
+  deviceAuditPath,
   deviceCompletedPath,
   deviceContinuePath,
+  deviceScanPath,
   isInProgressDevice,
 } from "@/lib/devices/device-navigation";
 import {
@@ -39,7 +41,9 @@ export default function DeviceDetail() {
   }
 
   const continuePath = deviceContinuePath(device);
+  const auditPath = deviceAuditPath(device.id);
   const deletionOnly = device.scanEntry === "deletion-only";
+  const isAuditStatus = device.status === "audit";
 
   return (
     <section className="flex min-h-full w-full min-w-0 flex-col gap-6 px-4 py-4 tablet:px-8">
@@ -72,7 +76,15 @@ export default function DeviceDetail() {
 
         {device.quoteUsd !== undefined ? (
           <p className="text-card-foreground" style={typography.bodyLarge}>
-            Quote: {device.quoteUsd} $
+            {deletionOnly
+              ? `Appraised value: ${device.quoteUsd} $`
+              : `Quote: ${device.quoteUsd} $`}
+          </p>
+        ) : null}
+        {deletionOnly ? (
+          <p className="text-muted-foreground" style={typography.bodyMedium}>
+            Erasure service: {MEMORY_DELETION_SERVICE_USD} $ (not a recycle
+            payout)
           </p>
         ) : null}
         {device.adjustmentUsd !== undefined ? (
@@ -85,9 +97,35 @@ export default function DeviceDetail() {
             {device.daysRemaining} days left
           </p>
         ) : null}
+
+        {isAuditStatus && !deletionOnly ? (
+          <p className="text-muted-foreground" style={typography.bodySmall}>
+            Video ready — your {device.quoteUsd ?? 0} $ PayPal payout is on the
+            way (typically within 4 hours). Watch the audit video anytime; review
+            is optional, not required to get paid.
+          </p>
+        ) : null}
       </div>
 
-      {isInProgressDevice(device) ? (
+      {isAuditStatus ? (
+        <div className="flex flex-col gap-3">
+          <Button
+            asChild
+            className="mobile-action mobile-action-primary h-14 rounded-full"
+            style={typography.button}
+          >
+            <Link to={auditPath}>Watch audit video (optional)</Link>
+          </Button>
+          <Button
+            asChild
+            variant="secondary"
+            className="mobile-action mobile-action-secondary h-14 rounded-full border border-secondary-button-stroke"
+            style={typography.button}
+          >
+            <Link to={deviceScanPath(device.id)}>Open full scan timeline</Link>
+          </Button>
+        </div>
+      ) : isInProgressDevice(device) ? (
         <Button
           asChild
           className="mobile-action mobile-action-primary h-14 rounded-full"

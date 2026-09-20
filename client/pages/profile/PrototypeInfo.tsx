@@ -39,11 +39,12 @@ export default function PrototypeInfo() {
             secondary-style control on the scan result screen.
           </li>
           <li>
-            Five mock rows: Galaxy S21 (audit wait), iPhone 13 mini (seal
+            Five mock rows: Galaxy S21 (audit-ready — waiting icon, bell
+            “final”, optional video / payout not blocked), iPhone 13 mini (seal
             arrived → ship), Pixel 8 (deletion-only scan), Motorola Edge 40
-            (seal delivery wait), iPhone XR (completed summary). Chevron
-            resumes each story; Home “Scan now” starts a fresh Galaxy S21 run
-            via <code className="text-foreground">fresh=1</code>.
+            (seal delivery wait), iPhone XR (completed summary). List sorts by
+            urgency; chevron resumes each story; Home “Scan now” starts a fresh
+            Galaxy S21 run via <code className="text-foreground">fresh=1</code>.
           </li>
           <li>
             Seal order: address → review → place order. Shipment: configure +

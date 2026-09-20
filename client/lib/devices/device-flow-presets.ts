@@ -74,7 +74,7 @@ export function buildScanBootstrap(device: DeviceRecord): ScanFlowState {
           "ship-configure": stepDone("Shipment options saved."),
           "ship-review": stepDone("Shipping label generated."),
           "ship-qr": stepDone("Carrier pickup confirmed."),
-          "ship-success": stepDone("Awaiting audit video and payout."),
+          "ship-success": stepDone("Handoff complete — payout processing; video optional."),
         },
         scanResult: {
           deviceName: device.name,
