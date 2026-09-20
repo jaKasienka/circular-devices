@@ -71,13 +71,18 @@ scripts/         Token generation
 
 ## Deploy on Vercel
 
-This repo includes `vercel.json` (build: `pnpm run build:client`, output: `dist/spa`, SPA rewrites). Import the GitHub project in Vercel or:
+Hosted on the same Vercel team as [pomodoro](https://github.com/jaKasienka/pomodoro): project **`circular-devices`** → **[circular-coral.vercel.app](https://circular-coral.vercel.app)**.
+
+`vercel.json` sets `pnpm install`, `pnpm run build:client`, output `dist/spa`, and SPA rewrites.
+
+**Auto-deploy from GitHub (recommended):** grant the Vercel GitHub app access to this repo, then connect Git—step-by-step in [`docs/VERCEL-GITHUB-SETUP.md`](docs/VERCEL-GITHUB-SETUP.md).
+
+**Manual deploy:**
 
 ```bash
+npx vercel link --project circular-devices --yes
 npx vercel --prod
 ```
-
-After deploy, add the production URL to this README and your [case study page](https://www.cembik.com/selected-projects/circular-devices).
 
 ## License
 

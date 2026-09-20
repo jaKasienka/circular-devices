@@ -1,0 +1,45 @@
+# Optional: auto-deploy when native Vercel↔GitHub connect is unavailable.
+# Add repo secrets (Settings → Secrets → Actions):
+#   VERCEL_TOKEN      — https://vercel.com/account/tokens (team owner may need to create)
+#   VERCEL_ORG_ID     — team_NQpHfFPDMUfB0QT8ddfAZesh (improvement1)
+#   VERCEL_PROJECT_ID — prj_XKRdgYl6ADJzOoZGgvWrt0e0Vbzp (circular-devices)
+#
+# Prefer native Git integration; see docs/VERCEL-GITHUB-SETUP.md
+
+name: Vercel Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install Vercel CLI
+        run: pnpm add -g vercel@latest
+
+      - name: Pull Vercel env
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
