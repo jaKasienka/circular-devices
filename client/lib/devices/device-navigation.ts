@@ -1,3 +1,4 @@
+import { DEMO_SCAN_DEVICE } from "@/lib/devices/demo-scan-device";
 import type { DeviceRecord } from "@/lib/devices/types";
 
 const ACTION_REQUIRED_STATUSES = ["scanned", "ready_shipment", "audit"] as const;
@@ -14,8 +15,18 @@ export function deviceDetailPath(device: DeviceRecord): string {
   return `/devices/${device.id}`;
 }
 
-export function deviceScanPath(deviceId: string): string {
-  return `/scan?device=${encodeURIComponent(deviceId)}`;
+export function deviceScanPath(deviceId: string, fresh = false): string {
+  const params = new URLSearchParams({ device: deviceId });
+  if (fresh) {
+    params.set("fresh", "1");
+  }
+  return `/scan?${params.toString()}`;
+}
+
+export function deviceFreshScanPath(
+  deviceId: string = DEMO_SCAN_DEVICE.id,
+): string {
+  return deviceScanPath(deviceId, true);
 }
 
 /** Chevron / continue: completed summary or scan re-entry for in-progress devices. */

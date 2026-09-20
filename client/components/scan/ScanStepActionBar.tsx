@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 
-import { Button } from "@/components/ui/button";
 import { isShipmentPickedUp } from "@/lib/scan/logistics-mock";
 import { MEMORY_DELETION_SERVICE_USD } from "@/lib/devices/constants";
 import { useScanFlow } from "@/lib/scan/ScanFlowContext";
 import type { ScanStepId } from "@/lib/scan/types";
-import { typography } from "@/tokens/design-tokens";
 import ScanBottomAction from "./ScanBottomAction";
 
 export default function ScanStepActionBar() {
@@ -18,64 +16,22 @@ export default function ScanStepActionBar() {
   }
 
   const action = getStepAction(state.activeStep, flow, capturing, setCapturing);
-  const secondary = getSecondaryAction(state.activeStep, flow);
 
-  if (!action && !secondary) {
+  if (!action) {
     return <div className="h-8 w-full shrink-0" aria-hidden />;
   }
 
-  if (action && !secondary) {
-    return (
-      <ScanBottomAction
-        label={action.label}
-        helperText={action.helperText}
-        disabled={action.disabled}
-        variant={action.variant}
-        type={action.type}
-        form={action.form}
-        onClick={action.onClick}
-      />
-    );
-  }
-
   return (
-    <div className="flex w-full shrink-0 flex-col gap-2 pt-2">
-      {action?.helperText ? (
-        <p
-          className="px-1 text-center text-muted-foreground"
-          style={typography.bodySmall}
-        >
-          {action.helperText}
-        </p>
-      ) : null}
-
-      {action ? (
-        <Button
-          type={action.type ?? "button"}
-          form={action.form}
-          disabled={action.disabled}
-          className="mobile-action mobile-action-primary h-14 min-h-14 w-full shrink-0 rounded-full focus-visible:ring-offset-background"
-          style={typography.button}
-          onClick={action.onClick}
-        >
-          {action.label}
-        </Button>
-      ) : null}
-
-      {secondary ? (
-        <Button
-          type="button"
-          variant="secondary"
-          className="mobile-action mobile-action-secondary h-14 min-h-14 w-full shrink-0 rounded-full border border-secondary-button-stroke focus-visible:ring-offset-background"
-          style={typography.button}
-          onClick={secondary.onClick}
-        >
-          {secondary.label}
-        </Button>
-      ) : null}
-
-      <div className="h-8 w-full shrink-0" aria-hidden />
-    </div>
+    <ScanBottomAction
+      key={state.activeStep}
+      label={action.label}
+      helperText={action.helperText}
+      disabled={action.disabled}
+      variant={action.variant}
+      type={action.type}
+      form={action.form}
+      onClick={action.onClick}
+    />
   );
 }
 
@@ -86,7 +42,7 @@ type ActionConfig = {
   variant?: "primary" | "secondary";
   type?: "button" | "submit";
   form?: string;
-  onClick?: () => void;
+  onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
 };
 
 type FlowApi = ReturnType<typeof useScanFlow>;
@@ -97,7 +53,15 @@ function getStepAction(
   capturing: boolean,
   setCapturing: (value: boolean) => void,
 ): ActionConfig | null {
-  const { state, completeStep, setScanResult, finishToDevices } = flow;
+  const {
+    state,
+    completeStep,
+    setScanResult,
+    finishToDevices,
+    continueFromSealIntro,
+    placeSealOrder,
+    generateShippingLabel,
+  } = flow;
 
   switch (stepId) {
     case "scan-instructions":
@@ -163,19 +127,31 @@ function getStepAction(
 
     case "seal-intro":
       return {
-        label: "Order seal",
-        onClick: () =>
-          completeStep(
-            "seal-intro",
-            "Reviewed tamper-evident seal requirements.",
-          ),
+        label: "Continue",
+        helperText: "Next: enter your delivery address",
+        onClick: (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          continueFromSealIntro();
+        },
       };
 
     case "seal-form":
       return {
-        label: "Confirm order",
+        label: "Continue to review",
         type: "submit",
         form: "seal-order-form",
+      };
+
+    case "seal-review":
+      return {
+        label: "Place order",
+        helperText: "This starts seal kit delivery tracking",
+        onClick: (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          placeSealOrder();
+        },
       };
 
     case "seal-wait":
@@ -193,9 +169,20 @@ function getStepAction(
 
     case "ship-configure":
       return {
-        label: "Generate shipping label",
+        label: "Continue to review",
         type: "submit",
         form: "ship-configure-form",
+      };
+
+    case "ship-review":
+      return {
+        label: "Generate shipping label",
+        helperText: "Next: show QR at partner drop-off",
+        onClick: (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          generateShippingLabel();
+        },
       };
 
     case "ship-qr":
@@ -231,17 +218,4 @@ function getStepAction(
     default:
       return null;
   }
-}
-
-function getSecondaryAction(stepId: ScanStepId, flow: FlowApi): ActionConfig | null {
-  const { completeStep, resetFlow } = flow;
-
-  if (stepId === "audit-waiting") {
-    return {
-      label: "Reset scan flow",
-      onClick: resetFlow,
-    };
-  }
-
-  return null;
 }

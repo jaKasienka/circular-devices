@@ -39,13 +39,21 @@ export default function PrototypeInfo() {
             secondary-style control on the scan result screen.
           </li>
           <li>
-            Device list re-entry: each mock device resumes the scan wizard at a
-            logical phase via <code className="text-foreground">/scan?device=…</code>.
+            Five mock rows: Galaxy S21 (audit wait), iPhone 13 mini (seal
+            arrived → ship), Pixel 8 (deletion-only scan), Motorola Edge 40
+            (seal delivery wait), iPhone XR (completed summary). Chevron
+            resumes each story; Home “Scan now” starts a fresh Galaxy S21 run
+            via <code className="text-foreground">fresh=1</code>.
           </li>
           <li>
-            Google Pixel 8 demonstrates deletion-only (too good to recycle);
-            iPhone XR opens the completed summary with certificate, video, and
-            materials CTAs.
+            Seal order: address → review → place order. Shipment: configure +
+            consents → review overview → generate label → QR drop-off → carrier
+            pickup confirmation.
+          </li>
+          <li>
+            Simulated seal delivery and carrier pickup use short delays (~3–5s)
+            for live demos. Refresh the page to restore the default device list
+            script; closing the scan with ✕ saves progress until you reload.
           </li>
           <li>Brandcyan design tokens, 375px-first layout, WCAG-oriented patterns.</li>
         </ul>

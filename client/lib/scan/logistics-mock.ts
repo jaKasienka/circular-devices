@@ -7,11 +7,12 @@ const SEAL_DELIVERY_SEQUENCE: SealDeliveryStatus[] = [
   "delivered",
 ];
 
+/** Short delays for portfolio demos (~3.5s seal delivery total). */
 const SEAL_DELIVERY_DELAYS_MS: Record<SealDeliveryStatus, number> = {
   idle: 0,
-  ordered: 2500,
-  dispatched: 5000,
-  out_for_delivery: 8000,
+  ordered: 900,
+  dispatched: 900,
+  out_for_delivery: 1200,
   delivered: 0,
 };
 
@@ -30,7 +31,7 @@ export function getSealDeliveryDelayMs(status: SealDeliveryStatus): number {
 }
 
 export function getShipmentPickupDelayMs(): number {
-  return 9000;
+  return 5000;
 }
 
 export function isSealDelivered(status: SealDeliveryStatus): boolean {

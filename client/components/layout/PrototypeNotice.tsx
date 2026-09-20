@@ -28,7 +28,7 @@ export default function PrototypeNotice() {
     >
       <p className="min-w-0 flex-1 text-pretty text-muted-foreground" style={typography.bodySmall}>
         <span className="text-foreground">Work in progress — portfolio prototype.</span>{" "}
-        Mock devices, logistics, and payments.{" "}
+        Mock devices, logistics, and payments. Reload to reset demo progress.{" "}
         <Link
           to="/profile/prototype"
           className="text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"

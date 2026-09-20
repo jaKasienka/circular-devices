@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 import IconBadge, { MaskedIcon } from "@/components/ui/icon-badge";
+import { deviceFreshScanPath } from "@/lib/devices/device-navigation";
 import { cn } from "@/lib/utils";
 import { typography } from "@/tokens/design-tokens";
 
@@ -22,7 +23,7 @@ const NAV_ITEMS = [
     icon: "/assets/nav-devices.svg",
   },
   {
-    to: "/scan",
+    to: deviceFreshScanPath(),
     label: "New Scan",
     icon: "/assets/nav-scan.svg",
   },

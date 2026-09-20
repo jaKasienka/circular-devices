@@ -2,7 +2,7 @@ import { Check, type LucideIcon } from "lucide-react";
 
 import IconBadge, { type IconBadgeVariant } from "@/components/ui/icon-badge";
 import { cn } from "@/lib/utils";
-import { getPhaseStatus, SCAN_PHASES } from "@/lib/scan/flow-config";
+import { getPhaseStatus, SCAN_PHASES, STEP_LABELS } from "@/lib/scan/flow-config";
 import { useScanFlow } from "@/lib/scan/ScanFlowContext";
 import type { ScanPhaseId } from "@/lib/scan/types";
 import { typography } from "@/tokens/design-tokens";
@@ -56,7 +56,7 @@ export default function ScanPhaseNav() {
         >
           {state.viewingCompletedPhase
             ? `Reviewing: ${SCAN_PHASES.find((entry) => entry.id === state.viewingCompletedPhase)?.label ?? ""}`
-            : activePhase.label}
+            : `${activePhase.label} — ${STEP_LABELS[state.activeStep]}`}
         </p>
       ) : null}
     </nav>

@@ -1,10 +1,12 @@
+import type { MouseEvent } from "react";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { typography } from "@/tokens/design-tokens";
 
 type ScanBottomActionProps = {
   label: string;
-  onClick?: () => void;
+  onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   helperText?: string;
   type?: "button" | "submit";

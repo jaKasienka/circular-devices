@@ -10,11 +10,13 @@ import {
   Smartphone,
 } from "lucide-react";
 
-import { DEMO_SCAN_DEVICE } from "@/lib/devices/demo-scan-device";
 import { MEMORY_DELETION_SERVICE_USD } from "@/lib/devices/constants";
+import { DEFAULT_SEAL_ORDER } from "@/lib/devices/device-flow-presets";
+import { DEMO_SCAN_DEVICE } from "@/lib/devices/demo-scan-device";
 import DeliveryTracker from "@/components/scan/DeliveryTracker";
 import { cn } from "@/lib/utils";
 import MaterialsCollapsible from "@/components/scan/MaterialsCollapsible";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,7 +36,10 @@ export default function ScanStepContent() {
   }
 
   return (
-    <div className="pb-4 transition-opacity duration-300">
+    <div
+      key={state.activeStep}
+      className="pb-4 transition-opacity duration-300"
+    >
       <StepPanel stepId={state.activeStep} />
     </div>
   );
@@ -53,13 +58,17 @@ function StepPanel({ stepId }: { stepId: ScanStepId }) {
     case "seal-intro":
       return <SealIntroStep />;
     case "seal-form":
-      return <SealFormStep />;
+      return <SealDeliveryAddressStep />;
+    case "seal-review":
+      return <SealOrderReviewStep />;
     case "seal-wait":
       return <SealWaitStep />;
     case "seal-arrived":
       return <SealArrivedStep />;
     case "ship-configure":
       return <ShipConfigureStep />;
+    case "ship-review":
+      return <ShipReviewStep />;
     case "ship-qr":
       return <ShipQrStep />;
     case "ship-success":
@@ -309,27 +318,35 @@ function SealIntroStep() {
           audit voids the quote.
         </p>
       </div>
-      <div className="flex aspect-video items-center justify-center rounded-lg bg-secondary/50">
+      <div className="flex h-24 items-center justify-center rounded-lg bg-secondary/50">
         <ShieldCheck
           aria-hidden
-          className="size-16 text-muted-foreground/50"
+          className="size-12 text-muted-foreground/50"
           strokeWidth={1.25}
         />
       </div>
+      <p className="text-muted-foreground" style={typography.bodySmall}>
+        Included with your scan at no extra charge. You will enter a delivery
+        address and review the order before it is placed.
+      </p>
     </StepShell>
   );
 }
 
-const DEFAULT_SEAL_ORDER: SealOrder = {
-  fullName: "Alex Morgan",
-  street: "12 Circular Way",
-  city: "Berlin",
-  country: "Germany",
-};
+function isSealOrderComplete(order: SealOrder): boolean {
+  return (
+    order.fullName.trim().length > 0 &&
+    order.street.trim().length > 0 &&
+    order.city.trim().length > 0 &&
+    order.country.trim().length > 0
+  );
+}
 
-function SealFormStep() {
-  const { setSealOrder, startSealDeliveryTracking, completeStep } = useScanFlow();
-  const [order, setOrder] = useState<SealOrder>(DEFAULT_SEAL_ORDER);
+function SealDeliveryAddressStep() {
+  const { state, saveSealDeliveryAddress } = useScanFlow();
+  const [order, setOrder] = useState<SealOrder>(
+    () => state.sealOrder ?? { ...DEFAULT_SEAL_ORDER },
+  );
 
   const updateField = (field: keyof SealOrder, value: string) => {
     setOrder((current) => ({ ...current, [field]: value }));
@@ -337,22 +354,20 @@ function SealFormStep() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSealOrder(order);
-    startSealDeliveryTracking();
-    completeStep(
-      "seal-form",
-      `Seal order submitted — shipping to ${order.city}, ${order.country}.`,
-    );
+    if (!isSealOrderComplete(order)) {
+      return;
+    }
+    saveSealDeliveryAddress(order);
   };
 
   return (
     <StepShell
       title="Delivery address"
-      lead="We ship the tamper-evident seal to you. Confirm or edit the address below."
+      lead="Where should we ship your tamper-evident seal kit?"
     >
       <form
         id="seal-order-form"
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-4 pb-2"
         onSubmit={handleSubmit}
       >
         <Field
@@ -363,7 +378,7 @@ function SealFormStep() {
         />
         <Field
           id="seal-street"
-          label="Street"
+          label="Street address"
           value={order.street}
           onChange={(value) => updateField("street", value)}
         />
@@ -380,6 +395,66 @@ function SealFormStep() {
           onChange={(value) => updateField("country", value)}
         />
       </form>
+    </StepShell>
+  );
+}
+
+function SealOrderReviewStep() {
+  const { state, editSealDeliveryAddress } = useScanFlow();
+  const order = state.sealOrder ?? DEFAULT_SEAL_ORDER;
+
+  return (
+    <StepShell
+      title="Review your order"
+      lead="Check the details below. Nothing is ordered until you tap Place order."
+    >
+      <div className="flex flex-col gap-3 rounded-md border border-border bg-card px-4 py-3">
+        <p className="text-foreground" style={typography.status}>
+          Order summary
+        </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-foreground" style={typography.bodyMedium}>
+              Tamper-evident seal kit
+            </p>
+            <p className="text-muted-foreground" style={typography.bodySmall}>
+              Unique ID linked to this device scan
+            </p>
+          </div>
+          <p className="shrink-0 text-foreground" style={typography.bodyMedium}>
+            Included
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 rounded-md border border-border bg-secondary/30 px-4 py-3">
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-foreground" style={typography.status}>
+            Ship to
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-auto px-0 py-0 text-primary underline-offset-2 hover:underline"
+            style={typography.bodySmall}
+            onClick={editSealDeliveryAddress}
+          >
+            Edit address
+          </Button>
+        </div>
+        <p className="text-card-foreground" style={typography.bodyMedium}>
+          {order.fullName}
+          <br />
+          {order.street}
+          <br />
+          {order.city}, {order.country}
+        </p>
+      </div>
+
+      <p className="text-muted-foreground" style={typography.bodySmall}>
+        By placing this order, you confirm the delivery address is correct. Seal
+        delivery tracking starts after you confirm.
+      </p>
     </StepShell>
   );
 }
@@ -437,112 +512,286 @@ function SealArrivedStep() {
 }
 
 function ShipConfigureStep() {
-  const {
-    state,
-    setShipmentPreferences,
-    startShipmentTracking,
-    completeStep,
-  } = useScanFlow();
+  const { state, saveShipmentDraft } = useScanFlow();
 
-  const defaultPickup = state.sealOrder ?? DEFAULT_SEAL_ORDER;
-  const [pickup, setPickup] = useState<SealOrder>(defaultPickup);
+  const sealAddress = state.sealOrder ?? DEFAULT_SEAL_ORDER;
+  const isDeletion = state.scanResult?.recyclePath === "memory-deletion";
+  const [pickupSameAsSeal, setPickupSameAsSeal] = useState(true);
+  const [pickup, setPickup] = useState<SealOrder>(sealAddress);
   const [notifyLivestream, setNotifyLivestream] = useState(true);
-  const [logisticsConsent, setLogisticsConsent] = useState(false);
+  const [logisticsHandling, setLogisticsHandling] = useState(false);
+  const [recordHandlingVideo, setRecordHandlingVideo] = useState(false);
+  const [certifiedDataErasure, setCertifiedDataErasure] = useState(isDeletion);
+  const [deviceRecycling, setDeviceRecycling] = useState(!isDeletion);
 
   const updatePickupField = (field: keyof SealOrder, value: string) => {
     setPickup((current) => ({ ...current, [field]: value }));
   };
 
+  const requiredConsentsMet =
+    logisticsHandling &&
+    recordHandlingVideo &&
+    (isDeletion ? certifiedDataErasure : deviceRecycling);
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!logisticsConsent) {
+    if (!requiredConsentsMet) {
       return;
     }
 
+    const resolvedPickup = pickupSameAsSeal ? sealAddress : pickup;
+
     const preferences: ShipmentPreferences = {
-      pickup,
+      pickupSameAsSeal,
+      pickup: resolvedPickup,
       notifyLivestream,
-      logisticsConsent,
+      handlingConsents: {
+        logisticsHandling,
+        recordHandlingVideo,
+        certifiedDataErasure,
+        deviceRecycling,
+      },
       paymentMethod: "paypal",
     };
 
-    setShipmentPreferences(preferences);
-    startShipmentTracking();
-    completeStep(
-      "ship-configure",
-      `Shipment configured — pickup at ${pickup.city}, payout via PayPal.`,
-    );
+    saveShipmentDraft(preferences);
   };
 
   return (
     <StepShell
       title="Configure shipment"
-      lead="Confirm pickup, logistics consent, and how you want to receive your video and payout."
+      lead="Confirm pickup, required consents, and payout. You will review everything before we generate your label."
     >
       <form
         id="ship-configure-form"
         className="flex flex-col gap-4"
         onSubmit={handleSubmit}
       >
-        <div className="flex flex-col gap-3">
+        <div className="rounded-md border border-border bg-secondary/30 px-4 py-3">
+          <p className="text-foreground" style={typography.status}>
+            Pickup / return address
+          </p>
+          <p className="mt-1 text-muted-foreground" style={typography.bodySmall}>
+            Seal kit was sent to your delivery address. Use the same location for
+            device pickup unless you need a different handoff point.
+          </p>
+          <ConsentRow
+            id="pickup-same-as-seal"
+            label="Same as seal delivery address"
+            checked={pickupSameAsSeal}
+            onCheckedChange={setPickupSameAsSeal}
+          />
+          {pickupSameAsSeal ? (
+            <p className="mt-2 text-card-foreground" style={typography.bodySmall}>
+              {sealAddress.fullName}, {sealAddress.street}, {sealAddress.city},{" "}
+              {sealAddress.country}
+            </p>
+          ) : (
+            <div className="mt-3 flex flex-col gap-3">
+              <Field
+                id="pickup-name"
+                label="Full name"
+                value={pickup.fullName}
+                onChange={(value) => updatePickupField("fullName", value)}
+              />
+              <Field
+                id="pickup-street"
+                label="Street"
+                value={pickup.street}
+                onChange={(value) => updatePickupField("street", value)}
+              />
+              <Field
+                id="pickup-city"
+                label="City"
+                value={pickup.city}
+                onChange={(value) => updatePickupField("city", value)}
+              />
+              <Field
+                id="pickup-country"
+                label="Country"
+                value={pickup.country}
+                onChange={(value) => updatePickupField("country", value)}
+              />
+            </div>
+          )}
+        </div>
+
+        {!isDeletion ? (
+          <div className="rounded-md border border-border bg-secondary/30 px-4 py-3">
+            <p className="text-foreground" style={typography.status}>
+              Payout method
+            </p>
+            <p className="mt-1 text-muted-foreground" style={typography.bodyMedium}>
+              PayPal —{" "}
+              {state.scanResult ? `${state.scanResult.quoteUsd} $` : "pending quote"}
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-md border border-border bg-secondary/30 px-4 py-3">
+            <p className="text-foreground" style={typography.status}>
+              Data erasure service
+            </p>
+            <p className="mt-1 text-muted-foreground" style={typography.bodyMedium}>
+              {MEMORY_DELETION_SERVICE_USD} $ service fee — device returned after audit
+            </p>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-3 rounded-md border border-border px-4 py-3">
+          <p className="text-foreground" style={typography.status}>
+            Your consent is needed
+          </p>
+
+          <ConsentRow
+            id="consent-logistics"
+            label="I consent to logistics handling and insurance for this sealed shipment"
+            checked={logisticsHandling}
+            onCheckedChange={setLogisticsHandling}
+            required
+          />
+
+          <ConsentRow
+            id="consent-video"
+            label="I consent to video recording of certified device handling"
+            checked={recordHandlingVideo}
+            onCheckedChange={setRecordHandlingVideo}
+            required
+          />
+
+          {isDeletion ? (
+            <ConsentRow
+              id="consent-erasure"
+              label="I consent to certified data erasure and secure return of my device"
+              checked={certifiedDataErasure}
+              onCheckedChange={setCertifiedDataErasure}
+              required
+            />
+          ) : (
+            <ConsentRow
+              id="consent-recycle"
+              label="I consent to device recycling and material recovery per my quote"
+              checked={deviceRecycling}
+              onCheckedChange={setDeviceRecycling}
+              required
+            />
+          )}
+
+          <ConsentRow
+            id="notify-livestream"
+            label="Notify me to join the certified device handling livestream (optional)"
+            checked={notifyLivestream}
+            onCheckedChange={setNotifyLivestream}
+          />
+        </div>
+      </form>
+    </StepShell>
+  );
+}
+
+function ShipReviewStep() {
+  const { state, editShipmentConfiguration } = useScanFlow();
+  const preferences = state.shipmentPreferences;
+  const pickup = preferences?.pickup ?? state.sealOrder ?? DEFAULT_SEAL_ORDER;
+  const isDeletion = state.scanResult?.recyclePath === "memory-deletion";
+
+  if (!preferences) {
+    return (
+      <StepShell
+        title="Review shipment"
+        lead="Shipment details are missing. Go back and configure pickup and consents."
+      >
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full rounded-full"
+          style={typography.button}
+          onClick={editShipmentConfiguration}
+        >
+          Back to configure
+        </Button>
+      </StepShell>
+    );
+  }
+
+  return (
+    <StepShell
+      title="Review shipment"
+      lead="Check pickup, payout, and consents. Your label is created only after you confirm below."
+    >
+      <div className="flex flex-col gap-3 rounded-md border border-border bg-card px-4 py-3">
+        <p className="text-foreground" style={typography.status}>
+          Shipment overview
+        </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-foreground" style={typography.bodyMedium}>
+              Sealed device pickup
+            </p>
+            <p className="text-muted-foreground" style={typography.bodySmall}>
+              Partner drop-off after label scan
+            </p>
+          </div>
+          <p className="shrink-0 text-muted-foreground" style={typography.bodySmall}>
+            Label next
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 rounded-md border border-border bg-secondary/30 px-4 py-3">
+        <div className="flex items-start justify-between gap-3">
           <p className="text-foreground" style={typography.status}>
             Pickup address
           </p>
-          <Field
-            id="pickup-name"
-            label="Full name"
-            value={pickup.fullName}
-            onChange={(value) => updatePickupField("fullName", value)}
-          />
-          <Field
-            id="pickup-street"
-            label="Street"
-            value={pickup.street}
-            onChange={(value) => updatePickupField("street", value)}
-          />
-          <Field
-            id="pickup-city"
-            label="City"
-            value={pickup.city}
-            onChange={(value) => updatePickupField("city", value)}
-          />
-          <Field
-            id="pickup-country"
-            label="Country"
-            value={pickup.country}
-            onChange={(value) => updatePickupField("country", value)}
-          />
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-auto px-0 py-0 text-primary underline-offset-2 hover:underline"
+            style={typography.bodySmall}
+            onClick={editShipmentConfiguration}
+          >
+            Edit
+          </Button>
         </div>
-
-        <div className="rounded-md border border-border bg-secondary/30 px-4 py-3">
-          <p className="text-foreground" style={typography.status}>
-            Payout method
-          </p>
-          <p className="mt-1 text-muted-foreground" style={typography.bodyMedium}>
-            PayPal —{" "}
-            {state.scanResult ? `${state.scanResult.quoteUsd} $` : "pending quote"}
-          </p>
-        </div>
-
-        <ConsentRow
-          id="notify-livestream"
-          label="Notify me to join the certified device handling livestream"
-          checked={notifyLivestream}
-          onCheckedChange={setNotifyLivestream}
-        />
-
-        <ConsentRow
-          id="logistics-consent"
-          label="I consent to logistics handling and insurance for this sealed shipment"
-          checked={logisticsConsent}
-          onCheckedChange={setLogisticsConsent}
-          required
-        />
-
-        <p className="text-muted-foreground" style={typography.bodySmall}>
-          Video will be sent to you as evidence of secure data handling.
+        <p className="text-card-foreground" style={typography.bodyMedium}>
+          {pickup.fullName}
+          <br />
+          {pickup.street}
+          <br />
+          {pickup.city}, {pickup.country}
         </p>
-      </form>
+      </div>
+
+      <div className="rounded-md border border-border bg-secondary/30 px-4 py-3">
+        <p className="text-foreground" style={typography.status}>
+          {isDeletion ? "Service & return" : "Payout"}
+        </p>
+        <p className="mt-1 text-muted-foreground" style={typography.bodyMedium}>
+          {isDeletion
+            ? `${MEMORY_DELETION_SERVICE_USD} $ certified erasure — device returned after audit`
+            : `PayPal — ${state.scanResult?.quoteUsd ?? 0} $ after certified handling`}
+        </p>
+      </div>
+
+      <div className="rounded-md border border-border px-4 py-3">
+        <p className="text-foreground" style={typography.status}>
+          Consents recorded
+        </p>
+        <ul className="mt-2 list-inside list-disc text-muted-foreground" style={typography.bodySmall}>
+          <li>Logistics handling and insurance</li>
+          <li>Video recording of certified handling</li>
+          <li>
+            {isDeletion ? "Certified data erasure and secure return" : "Device recycling per your quote"}
+          </li>
+          {preferences.notifyLivestream ? (
+            <li>Livestream notification (optional)</li>
+          ) : null}
+        </ul>
+      </div>
+
+      <p className="text-muted-foreground" style={typography.bodySmall}>
+        After the label, take your sealed device to a partner location. Carrier
+        scan confirms pickup — that is when your device leaves your hands.
+      </p>
     </StepShell>
   );
 }

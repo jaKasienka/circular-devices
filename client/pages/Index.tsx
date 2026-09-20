@@ -4,6 +4,7 @@ import { CircleDollarSign, ShieldCheck } from "lucide-react";
 
 import FeatureCard from "@/components/home/FeatureCard";
 import { Button } from "@/components/ui/button";
+import { deviceFreshScanPath } from "@/lib/devices/device-navigation";
 import { typography } from "@/tokens/design-tokens";
 
 const FEATURE_CARDS = [
@@ -107,7 +108,7 @@ export default function Index() {
           className="mobile-action mobile-action-primary h-14 min-w-0 flex-1 rounded-full px-4 focus-visible:ring-offset-background sm:px-6"
           style={fluidType(typography.button, 14, 4)}
         >
-          <Link to="/scan">SCAN NOW</Link>
+          <Link to={deviceFreshScanPath()}>SCAN NOW</Link>
         </Button>
       </div>
       <div className="h-8 w-full shrink-0" aria-hidden />

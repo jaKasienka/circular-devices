@@ -11,14 +11,22 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import {
+  buildFreshScanBootstrap,
+  buildScanBootstrap,
+} from "@/lib/devices/device-flow-presets";
+import { MOCK_DEVICES } from "@/lib/devices/mock-devices";
+import {
   getNextStep,
   getPhaseForStep,
   isPhaseComplete,
   SCAN_PHASES,
 } from "./flow-config";
-import { buildScanBootstrap } from "@/lib/devices/device-flow-presets";
-import { MOCK_DEVICES } from "@/lib/devices/mock-devices";
-
+import {
+  clearAllDeviceFlows,
+  clearDeviceFlow,
+  readDeviceFlow,
+  writeDeviceFlow,
+} from "./flow-storage";
 import {
   formatShippedDate,
   getNextSealDeliveryStatus,
@@ -37,7 +45,21 @@ import type {
   ShipmentStatus,
 } from "./types";
 
-const STORAGE_KEY = "circular-scan-flow";
+const LEGACY_STORAGE_KEY = "circular-scan-flow";
+
+function clearStoredFlowsOnPageReload() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const [navigation] = performance.getEntriesByType(
+    "navigation",
+  ) as PerformanceNavigationTiming[];
+
+  if (navigation?.type === "reload") {
+    clearAllDeviceFlows();
+  }
+}
 
 const INITIAL_STATE: ScanFlowState = {
   activePhase: "scan",
@@ -59,8 +81,36 @@ function normalizeStoredState(raw: Partial<ScanFlowState>): ScanFlowState {
   const merged = { ...INITIAL_STATE, ...raw };
 
   if (merged.activeStep === ("seal-ordered" as ScanStepId)) {
-    merged.activeStep = "seal-wait";
+    merged.activeStep = "seal-form";
   }
+
+  if (
+    merged.activeStep === "seal-wait" &&
+    !merged.completedSteps["seal-review"] &&
+    !merged.sealOrder
+  ) {
+    merged.activeStep = "seal-form";
+    merged.sealDeliveryStatus = "idle";
+  }
+
+  if (
+    merged.activeStep === "seal-wait" &&
+    merged.sealOrder &&
+    !merged.completedSteps["seal-review"]
+  ) {
+    merged.activeStep = "seal-review";
+    merged.sealDeliveryStatus = "idle";
+  }
+
+  if (
+    (merged.activeStep === "ship-qr" || merged.activeStep === "ship-success") &&
+    merged.shipmentPreferences &&
+    !merged.completedSteps["ship-review"]
+  ) {
+    merged.activeStep = "ship-review";
+    merged.shipmentStatus = "idle";
+  }
+
   if (merged.activeStep === ("audit-complete" as ScanStepId)) {
     merged.activeStep = "audit-waiting";
   }
@@ -75,19 +125,54 @@ function normalizeStoredState(raw: Partial<ScanFlowState>): ScanFlowState {
     merged.linkedDeviceId = null;
   }
 
+  if (
+    merged.shipmentPreferences &&
+    !("handlingConsents" in merged.shipmentPreferences)
+  ) {
+    const legacy = merged.shipmentPreferences as ShipmentPreferences & {
+      logisticsConsent?: boolean;
+    };
+    merged.shipmentPreferences = {
+      pickupSameAsSeal: true,
+      pickup: legacy.pickup,
+      notifyLivestream: legacy.notifyLivestream,
+      paymentMethod: legacy.paymentMethod,
+      handlingConsents: {
+        logisticsHandling: legacy.logisticsConsent ?? false,
+        recordHandlingVideo: legacy.notifyLivestream ?? false,
+        certifiedDataErasure: false,
+        deviceRecycling: true,
+      },
+    };
+  }
+
   return merged;
 }
 
-function readStoredState(): ScanFlowState {
-  try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return INITIAL_STATE;
-    }
-    return normalizeStoredState(JSON.parse(raw) as Partial<ScanFlowState>);
-  } catch {
+function resolveEntryState(
+  bootstrapDeviceId: string | null,
+  freshEntry: boolean,
+): ScanFlowState {
+  if (!bootstrapDeviceId) {
     return INITIAL_STATE;
   }
+
+  const device = MOCK_DEVICES.find((entry) => entry.id === bootstrapDeviceId);
+  if (!device || device.status === "completed") {
+    return INITIAL_STATE;
+  }
+
+  if (freshEntry) {
+    clearDeviceFlow(device.id);
+    return buildFreshScanBootstrap(device);
+  }
+
+  const saved = readDeviceFlow(bootstrapDeviceId);
+  if (saved) {
+    return normalizeStoredState(saved);
+  }
+
+  return buildScanBootstrap(device);
 }
 
 type ScanFlowContextValue = {
@@ -100,6 +185,13 @@ type ScanFlowContextValue = {
   setSealOrder: (order: SealOrder) => void;
   setShipmentPreferences: (preferences: ShipmentPreferences) => void;
   startSealDeliveryTracking: () => void;
+  continueFromSealIntro: () => void;
+  saveSealDeliveryAddress: (order: SealOrder) => void;
+  placeSealOrder: () => void;
+  editSealDeliveryAddress: () => void;
+  saveShipmentDraft: (preferences: ShipmentPreferences) => void;
+  generateShippingLabel: () => void;
+  editShipmentConfiguration: () => void;
   startShipmentTracking: () => void;
   resetFlow: () => void;
   finishToDevices: () => void;
@@ -108,23 +200,31 @@ type ScanFlowContextValue = {
 const ScanFlowContext = createContext<ScanFlowContextValue | null>(null);
 
 function persistState(state: ScanFlowState) {
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  if (state.linkedDeviceId) {
+    writeDeviceFlow(state.linkedDeviceId, state);
+  }
 }
 
 type ScanFlowProviderProps = {
   children: ReactNode;
   bootstrapDeviceId?: string | null;
+  freshEntry?: boolean;
 };
 
 export function ScanFlowProvider({
   children,
   bootstrapDeviceId = null,
+  freshEntry = false,
 }: ScanFlowProviderProps) {
   const navigate = useNavigate();
-  const [state, setState] = useState<ScanFlowState>(() => readStoredState());
+  const [state, setState] = useState<ScanFlowState>(() => {
+    sessionStorage.removeItem(LEGACY_STORAGE_KEY);
+    clearStoredFlowsOnPageReload();
+    return resolveEntryState(bootstrapDeviceId, freshEntry);
+  });
   const sealTimerRef = useRef<number | null>(null);
   const shipmentTimerRef = useRef<number | null>(null);
-  const appliedBootstrapRef = useRef<string | null>(null);
+  const entryKeyRef = useRef<string | null>(null);
 
   const updateState = useCallback(
     (updater: (current: ScanFlowState) => ScanFlowState) => {
@@ -138,20 +238,20 @@ export function ScanFlowProvider({
   );
 
   useEffect(() => {
-    if (!bootstrapDeviceId || appliedBootstrapRef.current === bootstrapDeviceId) {
+    if (!bootstrapDeviceId) {
       return;
     }
 
-    const device = MOCK_DEVICES.find((entry) => entry.id === bootstrapDeviceId);
-    if (!device || device.status === "completed") {
+    const entryKey = `${bootstrapDeviceId}:${freshEntry ? "fresh" : "resume"}`;
+    if (entryKeyRef.current === entryKey) {
       return;
     }
 
-    appliedBootstrapRef.current = bootstrapDeviceId;
-    const boot = buildScanBootstrap(device);
-    setState(boot);
-    persistState(boot);
-  }, [bootstrapDeviceId]);
+    entryKeyRef.current = entryKey;
+    const next = resolveEntryState(bootstrapDeviceId, freshEntry);
+    setState(next);
+    persistState(next);
+  }, [bootstrapDeviceId, freshEntry]);
 
   const clearSealTimer = useCallback(() => {
     if (sealTimerRef.current !== null) {
@@ -218,6 +318,99 @@ export function ScanFlowProvider({
     scheduleSealAdvance("ordered");
   }, [scheduleSealAdvance, updateState]);
 
+  const continueFromSealIntro = useCallback(() => {
+    updateState((current) => {
+      const now = Date.now();
+      const completedSteps: Partial<
+        Record<ScanStepId, CompletedStepRecord>
+      > = {
+        ...current.completedSteps,
+        "seal-intro": {
+          summary: "Reviewed tamper-evident seal requirements.",
+          completedAt: now,
+        },
+      };
+
+      if (!current.sealOrder) {
+        delete completedSteps["seal-form"];
+        delete completedSteps["seal-review"];
+        delete completedSteps["seal-wait"];
+      }
+
+      return {
+        ...current,
+        completedSteps,
+        activeStep: "seal-form",
+        activePhase: "seal",
+        sealDeliveryStatus: "idle",
+        viewingCompletedPhase: null,
+      };
+    });
+  }, [updateState]);
+
+  const saveSealDeliveryAddress = useCallback(
+    (order: SealOrder) => {
+      const now = Date.now();
+      updateState((current) => ({
+        ...current,
+        sealOrder: order,
+        sealDeliveryStatus: "idle",
+        completedSteps: {
+          ...current.completedSteps,
+          "seal-intro":
+            current.completedSteps["seal-intro"] ?? {
+              summary: "Reviewed tamper-evident seal requirements.",
+              completedAt: now,
+            },
+          "seal-form": {
+            summary: `Delivery address saved for ${order.city}, ${order.country}.`,
+            completedAt: now,
+          },
+        },
+        activeStep: "seal-review",
+        activePhase: "seal",
+        viewingCompletedPhase: null,
+      }));
+    },
+    [updateState],
+  );
+
+  const editSealDeliveryAddress = useCallback(() => {
+    updateState((current) => ({
+      ...current,
+      activeStep: "seal-form",
+      activePhase: "seal",
+      viewingCompletedPhase: null,
+    }));
+  }, [updateState]);
+
+  const placeSealOrder = useCallback(() => {
+    updateState((current) => {
+      if (!current.sealOrder) {
+        return current;
+      }
+
+      const now = Date.now();
+      const order = current.sealOrder;
+
+      return {
+        ...current,
+        sealDeliveryStatus: "ordered",
+        completedSteps: {
+          ...current.completedSteps,
+          "seal-review": {
+            summary: `Seal order placed — shipping to ${order.city}, ${order.country}.`,
+            completedAt: now,
+          },
+        },
+        activeStep: "seal-wait",
+        activePhase: "seal",
+        viewingCompletedPhase: null,
+      };
+    });
+    scheduleSealAdvance("ordered");
+  }, [scheduleSealAdvance, updateState]);
+
   const startShipmentTracking = useCallback(() => {
     clearShipmentTimer();
     updateState((current) => ({
@@ -230,6 +423,7 @@ export function ScanFlowProvider({
         ...current,
         shipmentStatus: "picked_up",
       }));
+      shipmentTimerRef.current = null;
     }, getShipmentPickupDelayMs());
   }, [clearShipmentTimer, updateState]);
 
@@ -366,10 +560,76 @@ export function ScanFlowProvider({
     [updateState],
   );
 
+  const saveShipmentDraft = useCallback(
+    (preferences: ShipmentPreferences) => {
+      const now = Date.now();
+      updateState((current) => ({
+        ...current,
+        shipmentPreferences: preferences,
+        shipmentStatus: "idle",
+        completedSteps: {
+          ...current.completedSteps,
+          "ship-configure": {
+            summary: `Shipment options saved — pickup at ${preferences.pickup.city}.`,
+            completedAt: now,
+          },
+        },
+        activeStep: "ship-review",
+        activePhase: "ship",
+        viewingCompletedPhase: null,
+      }));
+    },
+    [updateState],
+  );
+
+  const editShipmentConfiguration = useCallback(() => {
+    updateState((current) => ({
+      ...current,
+      activeStep: "ship-configure",
+      activePhase: "ship",
+      viewingCompletedPhase: null,
+    }));
+  }, [updateState]);
+
+  const generateShippingLabel = useCallback(() => {
+    updateState((current) => {
+      if (!current.shipmentPreferences) {
+        return current;
+      }
+
+      const now = Date.now();
+      const pickup = current.shipmentPreferences.pickup;
+
+      return {
+        ...current,
+        shipmentStatus: "awaiting_pickup",
+        completedSteps: {
+          ...current.completedSteps,
+          "ship-review": {
+            summary: `Shipping label generated — pickup at ${pickup.city}.`,
+            completedAt: now,
+          },
+        },
+        activeStep: "ship-qr",
+        activePhase: "ship",
+        viewingCompletedPhase: null,
+      };
+    });
+
+    clearShipmentTimer();
+    shipmentTimerRef.current = window.setTimeout(() => {
+      updateState((current) => ({
+        ...current,
+        shipmentStatus: "picked_up",
+      }));
+      shipmentTimerRef.current = null;
+    }, getShipmentPickupDelayMs());
+  }, [clearShipmentTimer, updateState]);
+
   const resetFlow = useCallback(() => {
     clearSealTimer();
     clearShipmentTimer();
-    sessionStorage.removeItem(STORAGE_KEY);
+    clearAllDeviceFlows();
     setState(INITIAL_STATE);
   }, [clearSealTimer, clearShipmentTimer]);
 
@@ -388,6 +648,13 @@ export function ScanFlowProvider({
       setSealOrder,
       setShipmentPreferences,
       startSealDeliveryTracking,
+      continueFromSealIntro,
+      saveSealDeliveryAddress,
+      placeSealOrder,
+      editSealDeliveryAddress,
+      saveShipmentDraft,
+      generateShippingLabel,
+      editShipmentConfiguration,
       startShipmentTracking,
       resetFlow,
       finishToDevices,
@@ -402,6 +669,13 @@ export function ScanFlowProvider({
       setSealOrder,
       setShipmentPreferences,
       startSealDeliveryTracking,
+      continueFromSealIntro,
+      saveSealDeliveryAddress,
+      placeSealOrder,
+      editSealDeliveryAddress,
+      saveShipmentDraft,
+      generateShippingLabel,
+      editShipmentConfiguration,
       startShipmentTracking,
       resetFlow,
       finishToDevices,

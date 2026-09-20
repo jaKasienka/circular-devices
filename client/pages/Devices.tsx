@@ -5,6 +5,7 @@ import { SlidersHorizontal } from "lucide-react";
 import DeviceListSummary from "@/components/devices/DeviceListSummary";
 import DeviceRow from "@/components/devices/DeviceRow";
 import { Button } from "@/components/ui/button";
+import { deviceFreshScanPath } from "@/lib/devices/device-navigation";
 import { DEVICE_LIST_CLASS } from "@/lib/devices/device-row-layout";
 import { MOCK_DEVICES } from "@/lib/devices/mock-devices";
 import { typography } from "@/tokens/design-tokens";
@@ -59,7 +60,7 @@ export default function Devices() {
         className="mobile-action mobile-action-primary mt-2 h-14 w-full shrink-0 rounded-full focus-visible:ring-offset-background"
         style={typography.button}
       >
-        <Link to="/scan">Scan a new Device</Link>
+        <Link to={deviceFreshScanPath()}>Scan a new Device</Link>
       </Button>
     </section>
   );

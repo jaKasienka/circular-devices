@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { X } from "lucide-react";
 
@@ -6,7 +6,7 @@ import CompletedPhaseSummary from "@/components/scan/CompletedPhaseSummary";
 import ScanPhaseNav from "@/components/scan/ScanPhaseNav";
 import ScanStepActionBar from "@/components/scan/ScanStepActionBar";
 import ScanStepContent from "@/components/scan/ScanStepContent";
-import { ScanFlowProvider } from "@/lib/scan/ScanFlowContext";
+import { ScanFlowProvider, useScanFlow } from "@/lib/scan/ScanFlowContext";
 import { typography } from "@/tokens/design-tokens";
 
 function pageTitleStyle(): CSSProperties {
@@ -14,6 +14,13 @@ function pageTitleStyle(): CSSProperties {
 }
 
 function ScanPageContent() {
+  const { state } = useScanFlow();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
+  }, [state.activeStep, state.viewingCompletedPhase]);
+
   return (
     <section
       className="flex min-h-full w-full min-w-0 flex-col px-4 pb-0 pt-2 tablet:px-8"
@@ -31,16 +38,19 @@ function ScanPageContent() {
         </h1>
 
         <Link
-          to="/"
+          to="/devices"
           className="flex size-10 shrink-0 items-center justify-center rounded-full bg-foreground text-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label="Close scan flow"
+          aria-label="Save progress and return to devices"
         >
           <X aria-hidden className="size-5" strokeWidth={2} />
         </Link>
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+        <div
+          ref={scrollRef}
+          className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain"
+        >
           <ScanPhaseNav />
           <CompletedPhaseSummary />
           <ScanStepContent />
@@ -55,9 +65,13 @@ function ScanPageContent() {
 export default function Scan() {
   const [searchParams] = useSearchParams();
   const bootstrapDeviceId = searchParams.get("device");
+  const freshEntry = searchParams.get("fresh") === "1";
 
   return (
-    <ScanFlowProvider bootstrapDeviceId={bootstrapDeviceId}>
+    <ScanFlowProvider
+      bootstrapDeviceId={bootstrapDeviceId}
+      freshEntry={freshEntry}
+    >
       <ScanPageContent />
     </ScanFlowProvider>
   );

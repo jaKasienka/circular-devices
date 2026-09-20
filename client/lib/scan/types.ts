@@ -7,9 +7,11 @@ export type ScanStepId =
   | "scan-result"
   | "seal-intro"
   | "seal-form"
+  | "seal-review"
   | "seal-wait"
   | "seal-arrived"
   | "ship-configure"
+  | "ship-review"
   | "ship-qr"
   | "ship-success"
   | "audit-waiting";
@@ -29,10 +31,18 @@ export type SealOrder = {
   country: string;
 };
 
+export type HandlingConsents = {
+  logisticsHandling: boolean;
+  recordHandlingVideo: boolean;
+  certifiedDataErasure: boolean;
+  deviceRecycling: boolean;
+};
+
 export type ShipmentPreferences = {
+  pickupSameAsSeal: boolean;
   pickup: SealOrder;
   notifyLivestream: boolean;
-  logisticsConsent: boolean;
+  handlingConsents: HandlingConsents;
   paymentMethod: "paypal";
 };
 

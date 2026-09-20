@@ -36,14 +36,14 @@ export const MOCK_DEVICES: DeviceRecord[] = [
   {
     id: DEMO_SCAN_DEVICE.id,
     name: DEMO_SCAN_DEVICE.name,
-    status: "scanned",
+    status: "audit",
     quoteUsd: DEMO_SCAN_DEVICE.quoteUsd,
     showPricePill: true,
   },
   {
     id: "device-2",
     name: "iPhone 13 mini",
-    status: "seal_ordered",
+    status: "ready_shipment",
     quoteUsd: 100,
     daysRemaining: 24,
   },
@@ -57,7 +57,7 @@ export const MOCK_DEVICES: DeviceRecord[] = [
   {
     id: "device-4",
     name: "Motorola Edge 40",
-    status: "shipped",
+    status: "seal_ordered",
     quoteUsd: 75,
   },
   {
