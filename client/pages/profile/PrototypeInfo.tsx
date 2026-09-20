@@ -46,6 +46,15 @@ export default function PrototypeInfo() {
           >
             Source on GitHub
           </a>
+          {" · "}
+          <a
+            href="https://circular-coral.vercel.app"
+            className="text-primary underline-offset-4 hover:underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Live prototype
+          </a>
         </p>
         <p className="text-muted-foreground" style={typography.bodySmall}>
           No personal data is collected in this demo. Images, quotes, and device

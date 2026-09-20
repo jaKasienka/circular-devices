@@ -4,7 +4,7 @@ Mobile-first UX prototype for **hardware lifecycle diagnostics**, **certified re
 
 | | |
 | --- | --- |
-| **Live prototype** | Import this repo in [Vercel](https://vercel.com/new) (settings in [Deploy](#deploy-on-vercel)); URL updates on each push to `main` |
+| **Live prototype** | [https://circular-coral.vercel.app](https://circular-coral.vercel.app) |
 | **Case study** | [Circular Devices — Katharina Cembik](https://www.cembik.com/selected-projects/circular-devices) |
 | **Source** | [github.com/jaKasienka/circular-devices](https://github.com/jaKasienka/circular-devices) |
 
