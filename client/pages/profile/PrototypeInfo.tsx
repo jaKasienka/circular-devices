@@ -18,8 +18,34 @@ export default function PrototypeInfo() {
       <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4">
         <p className="text-card-foreground" style={typography.bodyMedium}>
           Circular Devices is a mobile-first UX prototype for hardware
-          lifecycle diagnostics and certified recycling or data erasure. This
-          public build uses simulated scans, carriers, and payouts.
+          lifecycle diagnostics and certified recycling or data erasure. The
+          recycle path shows a straight trust flow (seal → ship → audit);{" "}
+          <strong className="font-medium text-foreground">
+            certified erase
+          </strong>{" "}
+          is a strongly recommended parallel path when data risk matters. A
+          future backend will intake all kinds of end-of-life devices—not only
+          hardware still “circulating.” This build uses simulated scans,
+          carriers, and payouts.
+        </p>
+        <p className="text-muted-foreground" style={typography.bodySmall}>
+          <a
+            href="https://www.cembik.com/selected-projects/circular-devices"
+            className="text-primary underline-offset-4 hover:underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Full case study on cembik.com
+          </a>
+          {" · "}
+          <a
+            href="https://github.com/jaKasienka/circular-devices"
+            className="text-primary underline-offset-4 hover:underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Source on GitHub
+          </a>
         </p>
         <p className="text-muted-foreground" style={typography.bodySmall}>
           No personal data is collected in this demo. Images, quotes, and device
