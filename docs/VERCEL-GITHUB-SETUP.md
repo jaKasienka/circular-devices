@@ -13,7 +13,9 @@ Build settings come from `vercel.json` (`pnpm install`, `pnpm run build:client`,
 
 ## Enable auto-deploy on push (match pomodoro)
 
-CLI `vercel git connect` fails until GitHub allows **this repository** for the Vercel app.
+**Status:** `jaKasienka/circular-devices` is connected to Vercel project `circular-devices`. Pushes to `main` trigger production builds.
+
+If you need to reconnect, CLI `vercel git connect` requires GitHub to allow **this repository** for the Vercel app.
 
 1. Open **[GitHub → Settings → Applications → Installed GitHub Apps](https://github.com/settings/installations)** (sign in as **jaKasienka**).
 2. Click **Vercel** → **Configure**.
