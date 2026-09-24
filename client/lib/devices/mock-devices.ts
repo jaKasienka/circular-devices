@@ -1,4 +1,9 @@
 import { DEMO_SCAN_DEVICE } from "@/lib/devices/demo-scan-device";
+import {
+  isActionRequiredDevice,
+  isDatabaseOnlyScannedDevice,
+} from "@/lib/devices/device-navigation";
+
 import type { DeviceRecord, DeviceStatusLegendItem } from "./types";
 
 export const DEVICE_STATUS_LEGEND: DeviceStatusLegendItem[] = [
@@ -50,7 +55,7 @@ export const MOCK_DEVICES: DeviceRecord[] = [
   {
     id: "device-3",
     name: "Google Pixel 8",
-    status: "ready_shipment",
+    status: "scanned",
     quoteUsd: 325,
     scanEntry: "deletion-only",
   },
@@ -87,8 +92,15 @@ export function getEarnedTotal(devices: DeviceRecord[]): number {
 }
 
 export function getActionRequiredCount(devices: DeviceRecord[]): number {
-  return devices.filter(
-    (device) =>
-      device.status === "scanned" || device.status === "ready_shipment",
-  ).length;
+  return devices.filter((device) => isActionRequiredDevice(device)).length;
+}
+
+/** Detail / legend copy — erasure-only scan is past scan, not “move on to recycle”. */
+export function getDeviceStatusLabel(device: DeviceRecord): string | undefined {
+  if (isDatabaseOnlyScannedDevice(device)) {
+    return "Scan complete — continue certified data erasure when you're ready.";
+  }
+
+  return DEVICE_STATUS_LEGEND.find((entry) => entry.status === device.status)
+    ?.label;
 }

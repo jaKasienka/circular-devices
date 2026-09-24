@@ -65,7 +65,7 @@ pnpm build:client
 client/          React SPA (pages, scan flow, UI)
 server/          Express (dev + production Node entry)
 shared/          Shared TypeScript types
-tokens/          Brandcyan primitive/semantic/typography tokens
+tokens/          Brandcyan primitive/semantic/typography/dimensions tokens
 scripts/         Token generation
 ```
 

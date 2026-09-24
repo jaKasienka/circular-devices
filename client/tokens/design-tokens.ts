@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import {
+  generatedDimensionTokens,
   generatedThemes,
   generatedTypographyTokens,
 } from "./generated-design-tokens";
@@ -60,7 +61,8 @@ export const typography = {
   status: resolveTypography("brandcyan-title-small"),
 } as const;
 
-type GeneratedTheme = Record<string, string | number>;
+type GeneratedTheme = Record<string, string>;
+type GeneratedDimensions = Record<string, number>;
 type ThemeStyle = CSSProperties & Record<`--${string}`, string>;
 
 function getColor(tokens: GeneratedTheme, tokenName: string): string {
@@ -73,22 +75,28 @@ function getColor(tokens: GeneratedTheme, tokenName: string): string {
   return value;
 }
 
-function getNumber(tokens: GeneratedTheme, tokenName: string): number {
+function getDimension(
+  tokens: GeneratedDimensions,
+  tokenName: string,
+): number {
   const value = tokens[tokenName];
 
   if (typeof value !== "number") {
-    throw new Error(`Expected a generated number token for: ${tokenName}`);
+    throw new Error(`Expected a generated dimension token for: ${tokenName}`);
   }
 
   return value;
 }
 
+const dimensionTokens =
+  generatedDimensionTokens as unknown as GeneratedDimensions;
+
 const darkTokens = generatedThemes.dark as GeneratedTheme;
 const lightTokens = generatedThemes.light as GeneratedTheme;
 
 export const radii = {
-  medium: getNumber(darkTokens, "radius-m"),
-  full: getNumber(darkTokens, "radius-full"),
+  medium: getDimension(dimensionTokens, "radius-m"),
+  full: getDimension(dimensionTokens, "radius-full"),
 } as const;
 
 function createThemeStyle(tokens: GeneratedTheme): ThemeStyle {

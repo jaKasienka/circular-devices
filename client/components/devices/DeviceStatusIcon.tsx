@@ -11,13 +11,29 @@ import type { DeviceStatus } from "@/lib/devices/types";
 type DeviceStatusIconProps = {
   status: DeviceStatus;
   className?: string;
+  /** Progress ring — scan/pipeline started, not an “action alert”. */
+  tone?: "default" | "progress";
 };
 
 export default function DeviceStatusIcon({
   status,
   className,
+  tone = "default",
 }: DeviceStatusIconProps) {
   const iconClass = cn("size-6 shrink-0", className);
+
+  if (
+    tone === "progress" &&
+    (status === "scanned" || status === "ready_shipment")
+  ) {
+    return (
+      <LoaderCircle
+        aria-hidden
+        className={cn(iconClass, "text-muted-foreground")}
+        strokeWidth={2}
+      />
+    );
+  }
 
   switch (status) {
     case "scanned":

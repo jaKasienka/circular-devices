@@ -7,10 +7,11 @@ import {
   deviceCompletedPath,
   deviceContinuePath,
   deviceScanPath,
+  isDatabaseOnlyScannedDevice,
   isInProgressDevice,
 } from "@/lib/devices/device-navigation";
 import {
-  DEVICE_STATUS_LEGEND,
+  getDeviceStatusLabel,
   MOCK_DEVICES,
 } from "@/lib/devices/mock-devices";
 import { Button } from "@/components/ui/button";
@@ -19,9 +20,6 @@ import { typography } from "@/tokens/design-tokens";
 export default function DeviceDetail() {
   const { deviceId } = useParams<{ deviceId: string }>();
   const device = MOCK_DEVICES.find((entry) => entry.id === deviceId);
-  const statusLabel = DEVICE_STATUS_LEGEND.find(
-    (entry) => entry.status === device?.status,
-  )?.label;
 
   if (!device) {
     return (
@@ -43,7 +41,9 @@ export default function DeviceDetail() {
   const continuePath = deviceContinuePath(device);
   const auditPath = deviceAuditPath(device.id);
   const deletionOnly = device.scanEntry === "deletion-only";
+  const databaseOnly = isDatabaseOnlyScannedDevice(device);
   const isAuditStatus = device.status === "audit";
+  const statusLabel = getDeviceStatusLabel(device);
 
   return (
     <section className="flex min-h-full w-full min-w-0 flex-col gap-6 px-4 py-4 tablet:px-8">
@@ -52,7 +52,11 @@ export default function DeviceDetail() {
           <Link to="/devices">← All Devices</Link>
         </Button>
         <div className="flex items-center gap-3">
-          <DeviceStatusIcon status={device.status} className="size-8" />
+          <DeviceStatusIcon
+            status={device.status}
+            tone={databaseOnly ? "progress" : "default"}
+            className="size-8"
+          />
           <h1 className="min-w-0 text-foreground" style={typography.headlineSmall}>
             {device.name}
           </h1>
@@ -68,9 +72,9 @@ export default function DeviceDetail() {
 
         {deletionOnly ? (
           <p className="text-muted-foreground" style={typography.bodySmall}>
-            Premium condition — recycling is not offered. Continue with certified
-            data erasure ({MEMORY_DELETION_SERVICE_USD} $ service) and device
-            return after audit.
+            Premium condition — certified data erasure only. Continue with the{" "}
+            {MEMORY_DELETION_SERVICE_USD} $ service and device return after
+            audit when you are ready.
           </p>
         ) : null}
 
@@ -83,8 +87,8 @@ export default function DeviceDetail() {
         ) : null}
         {deletionOnly ? (
           <p className="text-muted-foreground" style={typography.bodyMedium}>
-            Erasure service: {MEMORY_DELETION_SERVICE_USD} $ (not a recycle
-            payout)
+            Erasure service: {MEMORY_DELETION_SERVICE_USD} $ (service fee, not a
+            payout quote)
           </p>
         ) : null}
         {device.adjustmentUsd !== undefined ? (

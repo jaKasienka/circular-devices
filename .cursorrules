@@ -11,6 +11,7 @@ Your task is to take **functional lo-fi wireframes/user flows** and refactor the
 - **Dark Mode Primitives:** `@/tokens/brandcyan.dark.primitive.tokens.json`
 - **Dark Mode Semantics:** `@/tokens/brandcyan.dark.semantic.tokens.json`
 - **Typography:** `@/tokens/brandcyan.typography.styles.tokens.json`
+- **Dimensions (radius, spacing, layout numbers):** `@/tokens/brandcyan.dimensions.tokens.json`
 
 ## Token & Theme Rules:
 1. **Dark Theme (Default):** Use token aliases from `brandcyan.dark.semantic.tokens.json` (resolving against `brandcyan.dark.primitive.tokens.json`).

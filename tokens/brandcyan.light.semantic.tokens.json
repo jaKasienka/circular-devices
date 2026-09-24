@@ -1,24 +1,4 @@
 {
-  "radius-m": {
-    "$type": "number",
-    "$value": 12,
-    "$extensions": {
-      "com.figma.variableId": "VariableID:1118:4564",
-      "com.figma.scopes": [
-        "ALL_SCOPES"
-      ]
-    }
-  },
-  "radius-full": {
-    "$type": "number",
-    "$value": 100,
-    "$extensions": {
-      "com.figma.variableId": "VariableID:1122:4575",
-      "com.figma.scopes": [
-        "ALL_SCOPES"
-      ]
-    }
-  },
   "bottom-bar": {
     "$type": "color",
     "$value": "{Schemes.Primary 15}",

@@ -7,6 +7,9 @@ import {
   deviceDetailPath,
   isActionRequiredDevice,
   isAuditReadyDevice,
+  isDatabaseOnlyScannedDevice,
+  showDeviceListBell,
+  showDeviceListStatusIcon,
 } from "@/lib/devices/device-navigation";
 import {
   DEVICE_ROW_GRID_TEMPLATE,
@@ -25,10 +28,9 @@ function formatUsd(amount: number): string {
 
 export default function DeviceRow({ device }: DeviceRowProps) {
   const auditReady = isAuditReadyDevice(device);
-  const showBell =
-    device.daysRemaining !== undefined ||
-    isActionRequiredDevice(device) ||
-    auditReady;
+  const databaseOnly = isDatabaseOnlyScannedDevice(device);
+  const showBell = showDeviceListBell(device);
+  const showStatusIcon = showDeviceListStatusIcon(device);
 
   const hasQuote = device.quoteUsd !== undefined;
   const hasAdjustment = device.adjustmentUsd !== undefined;
@@ -40,7 +42,7 @@ export default function DeviceRow({ device }: DeviceRowProps) {
     if (auditReady) {
       return `Review audit video for ${device.name}`;
     }
-    if (actionRequired) {
+    if (databaseOnly || actionRequired) {
       return `Continue ${device.name} in scan flow`;
     }
     return `Open ${device.name} details`;
@@ -56,7 +58,17 @@ export default function DeviceRow({ device }: DeviceRowProps) {
         aria-label={`View ${device.name} status and details`}
       >
         <div className="flex items-center justify-center self-stretch pl-0.5">
-          <DeviceStatusIcon status={device.status} className="size-6" />
+          {databaseOnly ? (
+            <DeviceStatusIcon
+              status={device.status}
+              tone="progress"
+              className="size-6"
+            />
+          ) : showStatusIcon ? (
+            <DeviceStatusIcon status={device.status} className="size-6" />
+          ) : (
+            <span className="size-6 shrink-0" aria-hidden />
+          )}
         </div>
 
         <div className="flex min-w-0 items-center justify-start self-stretch pr-1">

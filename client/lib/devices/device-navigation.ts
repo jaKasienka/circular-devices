@@ -46,9 +46,31 @@ export function deviceContinuePath(device: DeviceRecord): string {
   return deviceScanPath(device.id);
 }
 
+/** Scan saved to the list only — no seal/ship pipeline yet (Pixel erasure path). */
+export function isDatabaseOnlyScannedDevice(device: DeviceRecord): boolean {
+  return device.status === "scanned" && device.scanEntry === "deletion-only";
+}
+
 export function isActionRequiredDevice(device: DeviceRecord): boolean {
+  if (isDatabaseOnlyScannedDevice(device)) {
+    return false;
+  }
+
   return ACTION_REQUIRED_STATUSES.includes(
     device.status as (typeof ACTION_REQUIRED_STATUSES)[number],
+  );
+}
+
+export function showDeviceListStatusIcon(device: DeviceRecord): boolean {
+  return !isDatabaseOnlyScannedDevice(device);
+}
+
+export function showDeviceListBell(device: DeviceRecord): boolean {
+  return (
+    isDatabaseOnlyScannedDevice(device) ||
+    device.daysRemaining !== undefined ||
+    isActionRequiredDevice(device) ||
+    isAuditReadyDevice(device)
   );
 }
 
@@ -63,6 +85,10 @@ export function isAuditReadyDevice(device: DeviceRecord): boolean {
 
 /** Lower score = higher urgency (matches “sorting filter: urgency” on Devices). */
 function deviceUrgencyScore(device: DeviceRecord): number {
+  if (isDatabaseOnlyScannedDevice(device)) {
+    return 18;
+  }
+
   switch (device.status) {
     case "scanned":
       return 0;
